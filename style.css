@@ -11,3 +11,5 @@
 .devilArt{width:122px;height:92px;object-fit:contain;filter:drop-shadow(0 7px 9px #000);z-index:1}.heroPatch{z-index:2}
 .devilExact{width:145px;height:105px;object-fit:contain;mix-blend-mode:normal;border:0;background:transparent}
 .devilUploadSlot{display:none}
+
+.historyCard button{display:flex;align-items:center;gap:8px}.countryGrid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0 22px}.country{display:flex;align-items:center;gap:9px;padding:14px 12px;border:1px solid #2d2d2d;border-radius:12px;background:#151515}.country svg{color:#d71920}.country b{font-size:14px}
