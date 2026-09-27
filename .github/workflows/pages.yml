@@ -26,6 +26,7 @@ jobs:
           cp 1000016806.PNG dist/
           cp IMG_1955.PNG dist/
           cp sol-preview.html dist/
+          cp sol-avatar.jpg dist/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
