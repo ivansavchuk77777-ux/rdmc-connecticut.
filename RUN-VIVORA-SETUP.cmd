@@ -1,9 +1,9 @@
 @echo off
 setlocal
-title RDMC Sol - Vivora One-File Setup
-echo RDMC Sol - Vivora one-file setup
+title RDMC Sol - Vivora Setup
+echo RDMC Sol - Vivora setup
 echo.
-powershell -NoProfile -ExecutionPolicy Bypass -Command "$ErrorActionPreference='Stop'; function Need($n,$h){if(-not(Get-Command $n -ErrorAction SilentlyContinue)){Write-Host ('Missing: '+$n) -ForegroundColor Yellow; Write-Host $h -ForegroundColor Yellow; exit 1}}; Need 'git' 'Install Git for Windows, then run this file again: https://git-scm.com/download/win'; Need 'docker' 'Install Docker Desktop, start it, then run this file again: https://www.docker.com/products/docker-desktop/'; try{docker info ^>$null 2^>^&1}catch{Write-Host 'Docker Desktop is installed but not running. Start Docker Desktop, wait for Engine running, then run this file again.' -ForegroundColor Yellow; exit 1}; $base=Join-Path $env:USERPROFILE 'RDMC-Sol'; $vivora=Join-Path $base 'vivora'; New-Item -ItemType Directory -Force -Path $base ^| Out-Null; if(-not(Test-Path $vivora)){Write-Host 'Downloading Vivora...' -ForegroundColor Cyan; git clone https://github.com/sur950/vivora.git $vivora}else{Write-Host 'Vivora already exists. Updating it...' -ForegroundColor Cyan; Push-Location $vivora; git pull; Pop-Location}; Set-Location $vivora; if(Test-Path '.\start.ps1'){^& .\start.ps1}elseif(Test-Path '.\start.bat'){^& .\start.bat}elseif(Test-Path '.\start.sh'){if(Get-Command bash -ErrorAction SilentlyContinue){bash ./start.sh}else{Write-Host 'Vivora needs Git Bash or WSL for start.sh.' -ForegroundColor Yellow; exit 1}}else{Write-Host 'Could not find a Vivora startup script.' -ForegroundColor Yellow; exit 1}; if(Test-Path '.\scripts\setup_musetalk.sh'){if(Get-Command bash -ErrorAction SilentlyContinue){Write-Host 'Installing MuseTalk lip-sync support...' -ForegroundColor Cyan; bash ./scripts/setup_musetalk.sh}else{Write-Host 'MuseTalk setup needs Git Bash or WSL.' -ForegroundColor Yellow}}; Write-Host 'Vivora setup step finished.' -ForegroundColor Green; Start-Process 'http://localhost:3000'"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0install-vivora.ps1"
 echo.
 echo If you see an error, take a screenshot and send it to Sol.
 pause
