@@ -20,14 +20,19 @@ jobs:
           node-version: 20
       - run: npm install
       - run: npm run build
-      - name: Copy event flyer assets and Sol preview into build
+      - name: Copy RDMC assets and Sol Live files into build
         run: |
           cp signal-2026-09-23-114809.JPG dist/
           cp 1000016806.PNG dist/
           cp IMG_1955.PNG dist/
-            cp IMG_1995.jpg dist/
+          cp IMG_1995.jpg dist/
           cp sol-preview.html dist/
+          cp sol-vivora.html dist/
           cp sol-avatar.jpg dist/
+          cp VIVORA_SETUP.md dist/
+          cp RUN-VIVORA-SETUP.cmd dist/
+          cp INSTALL-VIVORA-WINDOWS.bat dist/
+          cp install-vivora.ps1 dist/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
