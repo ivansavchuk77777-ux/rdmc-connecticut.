@@ -37,6 +37,56 @@ if (-not (Test-Path $vivora)) {
 
 Set-Location $vivora
 
+# Configure Vivora for RDMC Sol: local/free LLM + forced MuseTalk lip-sync.
+$envFile = Join-Path $vivora ".env"
+$envExample = Join-Path $vivora ".env.example"
+if (-not (Test-Path $envFile) -and (Test-Path $envExample)) {
+  Copy-Item $envExample $envFile
+}
+if (Test-Path $envFile) {
+  $cfg = Get-Content $envFile -Raw
+  function Set-EnvValue([string]$text,[string]$key,[string]$value) {
+    $pattern = "(?m)^" + [regex]::Escape($key) + "=.*$"
+    if ($text -match $pattern) { return [regex]::Replace($text,$pattern,"$key=$value") }
+    return $text.TrimEnd() + [Environment]::NewLine + "$key=$value" + [Environment]::NewLine
+  }
+  $secret = -join ((1..64) | ForEach-Object { "{0:x}" -f (Get-Random -Maximum 16) })
+  $jwt = -join ((1..64) | ForEach-Object { "{0:x}" -f (Get-Random -Maximum 16) })
+  $cfg = Set-EnvValue $cfg "LLM_PROVIDER" "ollama"
+  $cfg = Set-EnvValue $cfg "LLM_MODEL" "llama3.1"
+  $cfg = Set-EnvValue $cfg "OPENAI_BASE_URL" "http://host.docker.internal:11434/v1"
+  $cfg = Set-EnvValue $cfg "AVATAR_ENGINE" "musetalk"
+  $cfg = Set-EnvValue $cfg "AVATAR_ALLOW_VIDEO" "true"
+  $cfg = Set-EnvValue $cfg "SECRET_KEY" $secret
+  $cfg = Set-EnvValue $cfg "JWT_SECRET_KEY" $jwt
+  Set-Content -Path $envFile -Value $cfg -Encoding UTF8
+  Write-Host "Configured Vivora for local Ollama + forced MuseTalk lip-sync." -ForegroundColor Green
+}
+
+# Keep the approved RDMC Sol face beside Vivora so it is easy to upload.
+$rdmcSol = Join-Path $PSScriptRoot "sol-avatar.jpg"
+if (Test-Path $rdmcSol) {
+  Copy-Item $rdmcSol (Join-Path $vivora "RDMC-Sol.jpg") -Force
+  Write-Host "Copied approved Sol face to RDMC-Sol.jpg." -ForegroundColor Green
+}
+
+# Install Ollama automatically when winget is available; otherwise show the exact requirement.
+if (-not (Get-Command "ollama" -ErrorAction SilentlyContinue)) {
+  if (Get-Command "winget" -ErrorAction SilentlyContinue) {
+    Write-Host "Installing Ollama for local/free Sol responses..." -ForegroundColor Cyan
+    winget install --id Ollama.Ollama -e --accept-source-agreements --accept-package-agreements
+    $env:Path += ";$env:LOCALAPPDATA\Programs\Ollama"
+  } else {
+    Write-Host "Ollama is not installed. Install it from https://ollama.com/download/windows, then rerun this setup." -ForegroundColor Yellow
+  }
+}
+if (Get-Command "ollama" -ErrorAction SilentlyContinue) {
+  Write-Host "Preparing local llama3.1 model for Sol..." -ForegroundColor Cyan
+  Start-Process "ollama" -ArgumentList "serve" -WindowStyle Hidden -ErrorAction SilentlyContinue
+  Start-Sleep -Seconds 3
+  & ollama pull llama3.1
+}
+
 Write-Host "Starting Vivora..." -ForegroundColor Cyan
 if (Test-Path ".\start.ps1") {
   & .\start.ps1
