@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>RDMC • Sol Live Local</title>
   <style>
-    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 18%,#132a48,#07090d 58%,#000);color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center}.app{width:min(440px,94vw);padding:24px 16px;text-align:center}.brand{letter-spacing:4px;color:#d51e2b;font-weight:900;font-size:14px}.orb{width:250px;height:250px;border-radius:50%;margin:22px auto 14px;overflow:hidden;border:2px solid #39baff;box-shadow:0 0 26px #0af,0 0 70px #087cff66}.orb img{width:100%;height:100%;object-fit:cover}.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #267d54;background:#0d2a1e;color:#9be4bc;font-size:12px;font-weight:700}h1{font-size:30px;margin:10px 0 4px}.sub{color:#b9dfff;font-size:13px;line-height:1.5}.card{margin:18px 0;padding:14px;border-radius:14px;background:#0c1725;border:1px solid #1d4269;text-align:left}.card strong{display:block;margin-bottom:6px}.status{color:#79d3ff;font-weight:700;margin-top:8px}.controls{display:grid;gap:10px;margin-top:16px}.btn{display:block;text-decoration:none;border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px;background:#d51e2b;color:#fff;cursor:pointer}.btn.secondary{background:#15233a;border:1px solid #278cff}.small{font-size:12px;color:#9ca9b8;margin-top:14px}.back{display:inline-block;margin-top:16px;color:#79d3ff;text-decoration:none;font-size:13px}
+    *{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at 50% 18%,#132a48,#07090d 58%,#000);color:#fff;font-family:Arial,sans-serif;min-height:100vh;display:grid;place-items:center}.app{width:min(440px,94vw);padding:24px 16px;text-align:center}.brand{letter-spacing:4px;color:#d51e2b;font-weight:900;font-size:14px}.orb{width:250px;height:250px;border-radius:50%;margin:22px auto 14px;overflow:hidden;border:2px solid #39baff;box-shadow:0 0 26px #0af,0 0 70px #087cff66}.orb img{width:100%;height:100%;object-fit:cover}.badge{display:inline-block;padding:6px 10px;border-radius:999px;border:1px solid #267d54;background:#0d2a1e;color:#9be4bc;font-size:12px;font-weight:700}h1{font-size:30px;margin:10px 0 4px}.sub{color:#b9dfff;font-size:13px;line-height:1.5}.card{margin:18px 0;padding:14px;border-radius:14px;background:#0c1725;border:1px solid #1d4269;text-align:left}.card strong{display:block;margin-bottom:6px}.status{color:#79d3ff;font-weight:700;margin-top:8px}.access{margin-top:10px;padding:10px 12px;border-radius:12px;background:#0b1420;border:1px solid #1d4269;color:#a9c8e8;font-size:12px}.access.ok{border-color:#267d54;color:#9be4bc}.access.no{border-color:#77303a;color:#ffadb7}.controls{display:grid;gap:10px;margin-top:16px}.btn{display:block;text-decoration:none;border:0;border-radius:14px;padding:14px;font-weight:800;font-size:16px;background:#d51e2b;color:#fff;cursor:pointer}.btn.secondary{background:#15233a;border:1px solid #278cff}.btn:disabled{opacity:.42;cursor:not-allowed}.small{font-size:12px;color:#9ca9b8;margin-top:14px}.back{display:inline-block;margin-top:16px;color:#79d3ff;text-decoration:none;font-size:13px}
   </style>
 </head>
 <body>
@@ -19,20 +19,79 @@
   <div class="card">
     <strong>Local Sol engine</strong>
     <div>Vivora must be running on this computer before live motion can start.</div>
-    <div class="status" id="status">Ready to open local Vivora.</div>
+    <div class="status" id="status">Checking member access…</div>
+    <div class="access" id="access">Sol Live is available only to signed-in RDMC members with active access.</div>
   </div>
 
   <div class="controls">
-    <a class="btn" href="http://localhost:3000" target="_blank" rel="noopener">🎙 Open Live Sol</a>
-    <a class="btn secondary" href="http://localhost:8000/docs" target="_blank" rel="noopener">Check Local Engine</a>
+    <button class="btn" id="openSol" disabled>🎙 Open Live Sol</button>
+    <button class="btn secondary" id="checkEngine" disabled>Check Local Engine</button>
   </div>
 
-  <div class="small">First prototype launches the local engine directly. Once Vivora is exposed through HTTPS/WSS, the live avatar session can be embedded directly inside RDMC.</div>
+  <div class="small">Communication only. This launcher does not grant members permission to change RDMC settings, content, membership access, or app features.</div>
   <a class="back" href="./">← Return to RDMC</a>
 </main>
-<script>
+<script type="module">
+  import{createClient}from'https://esm.sh/@supabase/supabase-js@2';
+  const supabase=createClient('https://xvejpoblnoxidshrykte.supabase.co','sb_publishable_0cVlRcxK1DwKtovHSWjE4Q_sMvv1xr2');
   const status=document.getElementById('status');
-  window.addEventListener('focus',()=>{status.textContent='If Vivora opened, choose RDMC Sol and start the conversation.'});
+  const access=document.getElementById('access');
+  const openSol=document.getElementById('openSol');
+  const checkEngine=document.getElementById('checkEngine');
+  let allowed=false;
+
+  function enableSol(name){
+    allowed=true;
+    openSol.disabled=false;
+    checkEngine.disabled=false;
+    status.textContent='Access verified';
+    access.className='access ok';
+    access.textContent=(name?name+', ':'')+'your Sol Live communication access is active.';
+  }
+
+  function denySol(message){
+    allowed=false;
+    openSol.disabled=true;
+    checkEngine.disabled=true;
+    status.textContent='Access required';
+    access.className='access no';
+    access.textContent=message;
+  }
+
+  async function checkAccess(){
+    const{data:{user}}=await supabase.auth.getUser();
+    if(!user){
+      denySol('Sign in to the RDMC app first. Sol Live is available only to approved members with active dues/access.');
+      return;
+    }
+    const{data,error}=await supabase.from('profiles').select('full_name,subscription_status').eq('id',user.id).single();
+    if(error||!data){
+      denySol('Your RDMC member profile could not be verified.');
+      return;
+    }
+    if(!['active','exempt'].includes(data.subscription_status)){
+      denySol('Your RDMC access is not active. Sol Live becomes available when your dues/access status is active.');
+      return;
+    }
+    enableSol(data.full_name);
+  }
+
+  await checkAccess();
+
+  openSol.onclick=()=>{
+    if(!allowed)return;
+    status.textContent='Opening local Vivora…';
+    window.open('http://localhost:3000','_blank','noopener');
+  };
+
+  checkEngine.onclick=()=>{
+    if(!allowed)return;
+    window.open('http://localhost:8000/docs','_blank','noopener');
+  };
+
+  window.addEventListener('focus',()=>{
+    if(allowed)status.textContent='Access verified';
+  });
 </script>
 </body>
 </html>
