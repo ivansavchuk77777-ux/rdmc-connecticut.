@@ -9,7 +9,8 @@ Deno.serve(async (req) => {
   const jwt = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
   if (!jwt) return reply(401, { error: 'Sign in as the owner.' });
   const url = Deno.env.get('SUPABASE_URL');
-  const key = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('RDMC_SUPABASE_PUBLISHABLE_KEY');
+  const keys = Deno.env.get('SUPABASE_PUBLISHABLE_KEYS');
+  const key = (keys ? JSON.parse(keys).default : null) || Deno.env.get('SUPABASE_ANON_KEY');
   if (!url || !key) return reply(503, { error: 'RDMC database connection is not configured.' });
   const db = createClient(url, key, { global: { headers: { Authorization: authorization } }, auth: { persistSession: false } });
   const { data: userResult, error: userError } = await db.auth.getUser(jwt);
