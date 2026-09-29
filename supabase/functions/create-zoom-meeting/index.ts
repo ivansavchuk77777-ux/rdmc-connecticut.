@@ -1,0 +1,41 @@
+import { createClient } from 'npm:@supabase/supabase-js@2.57.0';
+
+const headers = { 'content-type': 'application/json', 'access-control-allow-origin': '*', 'access-control-allow-headers': 'authorization, apikey, content-type', 'access-control-allow-methods': 'POST, OPTIONS' };
+const reply = (status: number, body: object) => new Response(JSON.stringify(body), { status, headers });
+Deno.serve(async (req) => {
+  if (req.method === 'OPTIONS') return new Response(null, { status: 204, headers });
+  if (req.method !== 'POST') return reply(405, { error: 'Use POST.' });
+  const authorization = req.headers.get('authorization') || '';
+  const jwt = authorization.startsWith('Bearer ') ? authorization.slice(7) : '';
+  if (!jwt) return reply(401, { error: 'Sign in as the owner.' });
+  const url = Deno.env.get('SUPABASE_URL');
+  const key = Deno.env.get('SUPABASE_ANON_KEY') || Deno.env.get('RDMC_SUPABASE_PUBLISHABLE_KEY');
+  if (!url || !key) return reply(503, { error: 'RDMC database connection is not configured.' });
+  const db = createClient(url, key, { global: { headers: { Authorization: authorization } }, auth: { persistSession: false } });
+  const { data: userResult, error: userError } = await db.auth.getUser(jwt);
+  if (userError || !userResult.user) return reply(401, { error: 'Sign in again.' });
+  const { data: owner, error: ownerError } = await db.rpc('is_owner');
+  if (ownerError || owner !== true) return reply(403, { error: 'Only the RDMC owner can create Zoom calls.' });
+  let input;
+  try { input = await req.json(); } catch { return reply(400, { error: 'Invalid meeting details.' }); }
+  const title = String(input.title || '').trim();
+  const host_chapter = String(input.host_chapter || '').trim();
+  const starts_at = String(input.starts_at || '');
+  const audience = String(input.audience || 'all');
+  const date = new Date(starts_at);
+  if (!title || title.length > 120 || !host_chapter || host_chapter.length > 120 || !['all','ct_member','world_brother'].includes(audience) || Number.isNaN(date.getTime()) || date.getTime() < Date.now()) return reply(400, { error: 'Enter a title, host chapter, future time, and audience.' });
+  const account = Deno.env.get('ZOOM_ACCOUNT_ID');
+  const client = Deno.env.get('ZOOM_CLIENT_ID');
+  const secret = Deno.env.get('ZOOM_CLIENT_SECRET');
+  if (!account || !client || !secret) return reply(503, { error: 'Automatic Zoom creation needs the owner to connect a Zoom account.' });
+  const tokenResponse = await fetch('https://zoom.us/oauth/token?grant_type=account_credentials&account_id='+encodeURIComponent(account), { method:'POST', headers: { Authorization:'Basic '+btoa(client+':'+secret) } });
+  if (!tokenResponse.ok) return reply(502, { error: 'Zoom account connection failed. Check its permissions.' });
+  const token = await tokenResponse.json();
+  const meetingResponse = await fetch('https://api.zoom.us/v2/users/me/meetings', { method:'POST', headers: { Authorization:'Bearer '+token.access_token, 'Content-Type':'application/json' }, body:JSON.stringify({ topic:title, type:2, start_time:date.toISOString(), timezone:'UTC', duration:60, settings:{ waiting_room:true, join_before_host:false } }) });
+  if (!meetingResponse.ok) return reply(502, { error: 'Zoom could not create this meeting.' });
+  const meeting = await meetingResponse.json();
+  if (!/^https:\/\/[a-z0-9.-]*zoom\.(us|com)\/j\/[0-9]+/i.test(meeting.join_url || '')) return reply(502, { error:'Zoom did not return a valid join link.' });
+  const { data: record, error: saveError } = await db.from('zoom_meetings').insert({ title, host_chapter, starts_at:date.toISOString(), join_url:meeting.join_url, audience, created_by:userResult.user.id }).select('id,join_url').single();
+  if (saveError) return reply(500, { error:'Zoom created a meeting but RDMC could not save its link. Contact the owner before retrying.', zoom_meeting_id:meeting.id });
+  return reply(200, { id:record.id, join_url:record.join_url });
+});
