@@ -1,0 +1,8 @@
+{
+  "appId": "com.rdmc.bridgeport",
+  "appName": "RDMC Bridgeport",
+  "webDir": "dist-mobile",
+  "backgroundColor": "#090909",
+  "ios": { "contentInset": "automatic" },
+  "android": { "backgroundColor": "#090909" }
+}

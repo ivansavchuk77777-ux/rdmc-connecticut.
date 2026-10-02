@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RDMC Bridgeport</string>
+    <string name="title_activity_main">RDMC Bridgeport</string>
+    <string name="package_name">com.rdmc.bridgeport</string>
+    <string name="custom_url_scheme">com.rdmc.bridgeport</string>
+</resources>
