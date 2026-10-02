@@ -58,3 +58,5 @@ Enrollment, payments, account verification, agreements, certificates and store s
 The Mobile beta workflow builds the bundled web app, an Android debug APK and an unsigned iOS simulator app. These validate compilation, not device behavior or store acceptance. It never uploads to a store or sends invitations.
 
 References: https://capacitorjs.com/docs/getting-started/environment-setup ; https://developer.apple.com/help/app-store-connect/test-a-beta-version/testflight-overview/ ; https://support.google.com/googleplay/android-developer/answer/9845334
+
+Validation at preparation: the existing web build, mobile bundle, copied assets and Capacitor sync passed. Native compilation is not yet confirmed: the first Android CI attempt failed while requesting the removed SDK tools package; the workflow now requests platform-tools explicitly. The macOS job is awaiting a runner. Complete both native builds and real-device checks before inviting testers.
