@@ -1,0 +1,24 @@
+name: RDMC Build Check
+on:
+  push:
+    branches:
+      - fix/github-pages-entry-path-20261007
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: npm install --no-audit --no-fund
+      - run: npm run build
+      - name: Verify generated assets
+        run: |
+          test -f dist/index.html
+          test -d dist/assets
+          grep -q 'assets/' dist/index.html
