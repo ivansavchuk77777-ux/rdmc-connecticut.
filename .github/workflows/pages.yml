@@ -34,7 +34,7 @@ jobs:
           cp INSTALL-VIVORA-WINDOWS.bat dist/
           cp install-vivora.ps1 dist/
           mkdir -p dist/website
-          cp website/index.html dist/website/index.html
+          cp website/index.html website/sitemap.xml dist/website/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
