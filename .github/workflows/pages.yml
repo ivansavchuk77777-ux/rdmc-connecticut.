@@ -33,6 +33,7 @@ jobs:
           cp RUN-VIVORA-SETUP.cmd dist/
           cp INSTALL-VIVORA-WINDOWS.bat dist/
           cp install-vivora.ps1 dist/
+          cp CNAME dist/CNAME
           mkdir -p dist/website
           cp website/index.html website/sitemap.xml website/robots.txt dist/website/
       - uses: actions/configure-pages@v5
