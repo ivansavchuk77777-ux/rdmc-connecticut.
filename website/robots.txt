@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://rdmcfairfieldcounty.us/sitemap.xml
