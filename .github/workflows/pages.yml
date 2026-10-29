@@ -18,7 +18,8 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-      - run: yarn install --non-interactive
+      - run: npm ci --no-audit --no-fund
+      - run: node --test consumption.test.mjs
       - run: npm run build
       - name: Copy RDMC assets and Sol Live files into build
         run: |
