@@ -2,15 +2,28 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && cp signal-2026-09-23-114809.JPG 1000016806.PNG IMG_1955.PNG IMG_1995.jpg dist/",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "build:mobile": "vite build --mode mobile && node scripts/copy-mobile-assets.mjs",
+    "mobile:sync": "npm run build:mobile && cap sync",
+    "mobile:ios": "cap open ios",
+    "mobile:android": "cap open android",
+    "test": "node --test consumption.test.mjs"
   },
   "dependencies": {
+    "@capacitor/android": "8.6.0",
+    "@capacitor/core": "8.6.0",
+    "@capacitor/ios": "8.6.0",
+    "@supabase/supabase-js": "2.118.0",
     "@vitejs/plugin-react": "latest",
-    "vite": "latest",
+    "lucide-react": "latest",
     "react": "latest",
     "react-dom": "latest",
-    "lucide-react": "latest",
-    "@supabase/supabase-js": "2.118.0"
+    "vite": "latest"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@capacitor/cli": "8.6.0"
+  },
+  "name": "rdmc-fairfield-county-live",
+  "version": "0.1.0",
+  "private": true
 }

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">RDMC Fairfield County</string>
+    <string name="title_activity_main">RDMC Fairfield County</string>
+    <string name="package_name">us.rdmcfairfieldcounty.live</string>
+    <string name="custom_url_scheme">us.rdmcfairfieldcounty.live</string>
+</resources>
