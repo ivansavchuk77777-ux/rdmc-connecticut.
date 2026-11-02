@@ -2,6 +2,10 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && cp signal-2026-09-23-114809.JPG 1000016806.PNG IMG_1955.PNG IMG_1995.jpg dist/",
+    "build:ios": "vite build --base ./ && cp signal-2026-09-23-114809.JPG 1000016806.PNG IMG_1955.PNG IMG_1995.jpg dist/",
+    "ios:add": "npx cap add ios",
+    "ios:sync": "npm run build:ios && npx cap sync ios",
+    "ios:open": "npx cap open ios",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -10,7 +14,11 @@
     "react": "latest",
     "react-dom": "latest",
     "lucide-react": "latest",
-    "@supabase/supabase-js": "2.118.0"
+    "@supabase/supabase-js": "2.118.0",
+    "@capacitor/core": "^7.0.0"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@capacitor/cli": "^7.0.0",
+    "@capacitor/ios": "^7.0.0"
+  }
 }
