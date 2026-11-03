@@ -27,13 +27,10 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - name: Install existing project dependencies
-        run: npm install --no-audit --no-fund
-      - name: Upload refreshed dependency lock for review
-        uses: actions/upload-artifact@v4
-        with:
-          name: ios-updated-package-lock
-          path: package-lock.json
+      - name: Install locked website dependencies
+        run: npm ci --no-audit --no-fund
+      - name: Install isolated Capacitor iOS build tools
+        run: npm install --no-save --package-lock=false --no-audit --no-fund @capacitor/core@^7 @capacitor/cli@^7 @capacitor/ios@^7
       - name: Build web assets for iOS
         run: npm run build:ios
       - name: Add iOS platform to existing application
