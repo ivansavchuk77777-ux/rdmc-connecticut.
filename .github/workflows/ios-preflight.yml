@@ -1,0 +1,30 @@
+name: RDMC iOS preparation checks
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out project
+        uses: actions/checkout@v4
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install locked dependencies
+        run: npm ci
+      - name: Run member-access tests
+        run: npm test
+      - name: Build existing web application
+        run: npm run build
+      - name: Verify original logo in build
+        run: test -s dist/IMG_1955.PNG

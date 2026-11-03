@@ -1,0 +1,50 @@
+name: RDMC iOS native packaging (unsigned)
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  prepare-ios:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - name: Install dependencies
+        run: npm ci
+      - name: Verify tests and web build
+        run: |
+          npm test
+          npm run build
+          test -s dist/IMG_1955.PNG
+      - name: Package web assets with relative paths for iOS
+        run: |
+          npx vite build --base ./
+          cp signal-2026-09-23-114809.JPG 1000016806.PNG IMG_1955.PNG IMG_1995.jpg dist/
+          test -s dist/IMG_1955.PNG
+      - name: Install compatible Capacitor packaging tools (temporary)
+        run: npm install --no-save --package-lock=false @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7
+      - name: Verify native packaging dependencies
+        run: npm ls @capacitor/core @capacitor/cli @capacitor/ios
+      - name: Generate and synchronize iOS project
+        run: |
+          npx cap add ios
+          npx cap sync ios
+      - name: Validate Xcode project generated
+        run: |
+          test -d ios/App/App.xcodeproj
+      - name: Upload unsigned iOS project for inspection
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdmc-ios-project-unsigned
+          path: ios/
+          retention-days: 7
+
+# This workflow intentionally does not sign, archive, upload to TestFlight,
+# or publish the app. Apple signing and review are separate authorized steps.
