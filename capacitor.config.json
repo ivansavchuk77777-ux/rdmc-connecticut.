@@ -1,0 +1,8 @@
+{
+  "appId": "us.rdmcfairfieldcounty.live",
+  "appName": "RDMC Fairfield County Live",
+  "webDir": "dist",
+  "server": {
+    "iosScheme": "capacitor"
+  }
+}
