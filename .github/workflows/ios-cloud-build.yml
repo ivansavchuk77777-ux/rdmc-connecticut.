@@ -31,8 +31,19 @@ jobs:
         run: npm ci --no-audit --no-fund
       - name: Install isolated Capacitor iOS build tools
         run: npm install --no-save --package-lock=false --no-audit --no-fund @capacitor/core@^7 @capacitor/cli@^7 @capacitor/ios@^7
+      - name: Verify original red devil logo is present
+        run: |
+          test -s IMG_1995.jpg
+          shasum -a 256 IMG_1995.jpg > "$RUNNER_TEMP/original-logo.sha256"
+      - name: Run existing consumption tracker tests
+        run: node --test consumption.test.mjs
       - name: Build web assets for iOS
         run: npm run build:ios
+      - name: Verify original logo was copied without modification
+        run: |
+          test -s dist/IMG_1995.jpg
+          cmp IMG_1995.jpg dist/IMG_1995.jpg
+          shasum -a 256 -c "$RUNNER_TEMP/original-logo.sha256"
       - name: Add iOS platform to existing application
         run: npx cap add ios
       - name: Sync existing application into iOS project
