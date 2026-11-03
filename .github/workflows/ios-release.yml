@@ -2,11 +2,6 @@ name: RDMC signed iOS release
 
 on:
   workflow_dispatch:
-  push:
-    branches:
-      - app-store-ios-preparation
-    paths:
-      - '.github/workflows/ios-release.yml'
 
 permissions:
   contents: read
