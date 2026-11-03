@@ -23,9 +23,10 @@ jobs:
           npm test
           npm run build
           test -s dist/IMG_1955.PNG
+      - name: Install compatible Capacitor packaging tools (temporary)
+        run: npm install --no-save --package-lock=false @capacitor/core@7 @capacitor/cli@7 @capacitor/ios@7
       - name: Verify native packaging dependencies
-        run: |
-          npm ls @capacitor/core @capacitor/cli @capacitor/ios
+        run: npm ls @capacitor/core @capacitor/cli @capacitor/ios
       - name: Generate and synchronize iOS project
         run: |
           npx cap add ios
