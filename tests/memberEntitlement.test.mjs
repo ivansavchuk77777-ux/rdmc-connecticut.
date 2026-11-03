@@ -30,3 +30,10 @@ test('shows safe messages when verification is missing or access is blocked', ()
   assert.match(subscriptionAccessMessage({ profile }), /Checking subscription/);
   assert.match(subscriptionAccessMessage({ profile: { ...profile, subscription_status: 'blocked' }, entitlement: verified }), /blocked/i);
 });
+
+test('expired or unknown profile status never passes even with active Apple entitlement', () => {
+  for (const status of ['expired', 'unknown', null]) {
+    assert.equal(canOpenMemberServices({ profile: { ...profile, subscription_status: status }, entitlement: verified }), false);
+  }
+  assert.match(subscriptionAccessMessage({ profile: { ...profile, subscription_status: 'expired' }, entitlement: verified }), /approval or renewal/i);
+});
