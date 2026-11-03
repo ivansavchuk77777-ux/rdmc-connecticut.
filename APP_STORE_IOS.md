@@ -1,32 +1,29 @@
-# RDMC Fairfield County Live — iOS App Store preparation
+# RDMC Fairfield County Live — iOS release handoff
 
-This is the **existing** React/Vite/Supabase RDMC Live application, not a new project. The existing image assets, including `IMG_1995.jpg`, are preserved. Do not substitute or redraw the club logo.
+This is the **existing** React/Vite/Supabase RDMC Live app, not a new project. Keep the original `IMG_1995.jpg` logo unchanged. The iOS packaging work remains on `app-store-ios-preparation`; the public website on `main` has not been changed by this branch.
 
-## Status
-- iOS packaging configuration prepared on the `app-store-ios-preparation` branch.
-- Native Xcode project, app icon asset catalog, signed archive, TestFlight testing, Apple Developer enrollment, and App Store submission **not yet completed**.
-- An active Apple Developer membership and access to a Mac with current supported Xcode (or a secure macOS CI build) are needed to produce and sign the iOS release.
+## Verified November 3, 2026
 
-## Create native iOS project on a Mac
-1. Clone **this exact repository** (note the final period in its repository name) and switch to `app-store-ios-preparation`.
-2. Install Node.js LTS and Xcode. Run `npm install`.
-3. Run `npm run build:ios` to create a web build with relative asset paths.
-4. Run `npm run ios:add` **once** to generate the native iOS folder inside this existing repository.
-5. Run `npm run ios:sync` after each web app change.
-6. Run `npm run ios:open`, then select your Apple Developer Team under Signing & Capabilities and test on iPhone.
-7. Use Xcode Archive / Distribute to upload to App Store Connect, first testing with TestFlight.
+- **Signed App Store iPhone release: PASSED** in GitHub Actions run [41670163993](https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/41670163993).
+- The workflow completed dependency installation, consumption tests, web build, original-logo comparison, Capacitor iOS generation/sync, Release archive, IPA export, and artifact upload successfully.
+- Artifact: `RDMC-signed-iPhone-release` (2,661,772 bytes; artifact ID `13249245280`), expires **November 10, 2026**. [Download from the workflow run](https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/41670163993) while signed in to GitHub.
+- App identifier: `us.rdmcfairfieldcounty.live`; Apple Team: `B852HHFN2S`.
+- The signing credentials are held as encrypted GitHub Actions secrets, not source files.
+- **Not yet done:** IPA upload to App Store Connect; Apple processing; TestFlight distribution; physical iPhone acceptance test; App Store review and publication. A passing build does not imply Apple acceptance.
 
-The proposed bundle identifier is `us.rdmcfairfieldcounty.live`; verify availability and ownership in your Apple account before locking it. The public website GitHub Pages Vite build remains unchanged.
+## Next action: upload the existing IPA to TestFlight
 
-## Before requesting Apple review
-- Provide a real privacy policy and support URL, and complete App Store Connect privacy disclosures.
-- Ensure an accessible in-app account deletion initiation flow if users can create accounts; administrative member deactivation alone does not satisfy account deletion.
-- Provide App Review with a working approved demo account or Apple-approved demo mode; member-only access does not waive review requirements.
-- Verify native navigation, external links, email/SMS links, login persistence, zoom, downloads, and all core screens on a real iPhone.
-- Confirm ownership and authorization to use club name, marks, images, and merchandise imagery.
-- Confirm any paid digital membership/subscriptions comply with App Store payment rules; physical merchandise has different rules.
-- Prepare an original authorized 1024×1024 app icon derived from the existing logo (do not alter or replace the original logo), screenshots of the actual iOS app, description, age rating, contact details, and release notes.
-- Check backend RLS policies and user data permissions, including consumption records. Do not include private keys or Apple credentials in GitHub.
-- Confirm app offers functionality beyond a basic website wrapper, per App Review Guideline 4.2.
+1. In the existing GitHub Actions run above, open artifact `RDMC-signed-iPhone-release` and download its ZIP. Extract the `.ipa` file. Do not rename or edit its contents.
+2. In [App Store Connect](https://appstoreconnect.apple.com/apps), open the existing **RDMC Fairfield County Live** app (do not register another app).
+3. Upload the IPA using **Apple Transporter on a Mac**, **Xcode Organizer**, or a properly authorized macOS CI upload integration. App Store Connect's normal web app page is not a general-purpose IPA uploader. Windows alone cannot use Apple Transporter for macOS; an authorized macOS cloud runner with App Store Connect API credentials is an alternative.
+4. Wait for Apple processing, address any validation messages, and enable an internal TestFlight tester.
+5. Test login/member authorization, account deletion, data isolation (including the consumption tracker), logo/app icon, navigation, notifications, and purchases on a physical iPhone. Confirm the app is more than a simple website wrapper.
+6. Before requesting review, verify support/privacy-policy URLs, privacy disclosures, actual app screenshots, review/demo access, account deletion, permissions to use brand imagery, and Apple's payment rules. Paid download or monthly subscriptions have **not** been verified as configured.
+7. Submit for review only after TestFlight passes and the account holder confirms the final listing and commercial terms.
 
-This preparation branch is intentionally separate from the live website until reviewed and merged.
+## Important release constraints
+
+- Do not publish an untested binary to the App Store.
+- Never place Apple private keys, P12s, provisioning profiles, API keys, or passwords in commits, PR descriptions, or issue comments.
+- This is a draft PR; do not merge the preparation branch into the public website until its changes are reviewed.
+- The `.ipa` is time-limited in Actions; rerun the existing signed release workflow if the artifact expires.
