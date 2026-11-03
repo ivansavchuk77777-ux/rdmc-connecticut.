@@ -1,0 +1,59 @@
+name: RDMC Live iOS cloud build check
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - app-store-ios-preparation
+    paths:
+      - 'src.jsx'
+      - 'style.css'
+      - 'ConsumptionTracker.jsx'
+      - 'package.json'
+      - 'capacitor.config.json'
+      - '.github/workflows/ios-cloud-build.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  ios-simulator-check:
+    name: Build existing RDMC Live app on cloud Mac
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Install existing project dependencies
+        run: npm install --no-audit --no-fund
+      - name: Build web assets for iOS
+        run: npm run build:ios
+      - name: Add iOS platform to existing application
+        run: npx cap add ios
+      - name: Sync existing application into iOS project
+        run: npx cap sync ios
+      - name: Show Xcode and available project files
+        run: |
+          xcodebuild -version
+          ls -la ios/App/
+      - name: Build for iPhone simulator (no signing credentials needed)
+        run: |
+          set -o pipefail
+          xcodebuild \
+            -workspace ios/App/App.xcworkspace \
+            -scheme App \
+            -configuration Debug \
+            -sdk iphonesimulator \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath "$RUNNER_TEMP/rdmc-ios-build" \
+            CODE_SIGNING_ALLOWED=NO \
+            build 2>&1 | tee "$RUNNER_TEMP/rdmc-xcodebuild.log"
+      - name: Save diagnostic build log
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rdmc-ios-build-log
+          path: ${{ runner.temp }}/rdmc-xcodebuild.log
+          if-no-files-found: ignore
