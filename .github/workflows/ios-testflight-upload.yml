@@ -1,0 +1,64 @@
+name: RDMC upload existing IPA to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      source_run_id:
+        description: "Successful signed iOS release GitHub Actions run ID"
+        required: true
+        default: "41670163993"
+        type: string
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: rdmc-testflight-upload
+  cancel-in-progress: false
+
+jobs:
+  upload:
+    name: Upload signed RDMC IPA to App Store Connect
+    runs-on: macos-latest
+    timeout-minutes: 35
+    steps:
+      - name: Check upload authorization
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "$ASC_API_KEY_ID" || -z "$ASC_API_ISSUER_ID" || -z "$ASC_API_KEY_BASE64" ]]; then
+            echo "::error::Missing App Store Connect credentials. Add ASC_API_KEY_ID, ASC_API_ISSUER_ID, and ASC_API_KEY_BASE64 in repository Actions secrets. Do not commit keys."
+            exit 1
+          fi
+          [[ "$ASC_API_KEY_ID" =~ ^[A-Z0-9]+$ ]] || { echo "::error::Invalid App Store Connect API key ID format"; exit 1; }
+      - name: Download existing signed IPA from release run
+        uses: actions/download-artifact@v4
+        with:
+          name: RDMC-signed-iPhone-release
+          run-id: ${{ inputs.source_run_id }}
+          github-token: ${{ github.token }}
+          path: ${{ runner.temp }}/rdmc-upload
+      - name: Upload IPA securely
+        env:
+          ASC_API_KEY_ID: ${{ secrets.ASC_API_KEY_ID }}
+          ASC_API_ISSUER_ID: ${{ secrets.ASC_API_ISSUER_ID }}
+          ASC_API_KEY_BASE64: ${{ secrets.ASC_API_KEY_BASE64 }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          umask 077
+          IPA="$(find "$RUNNER_TEMP/rdmc-upload" -type f -name '*.ipa' -print -quit)"
+          [[ -n "$IPA" && -s "$IPA" ]] || { echo "::error::No IPA found in chosen run"; exit 1; }
+          mkdir -p "$RUNNER_TEMP/asc-private-keys"
+          KEY_FILE="$RUNNER_TEMP/asc-private-keys/AuthKey_${ASC_API_KEY_ID}.p8"
+          trap 'rm -f "$KEY_FILE"' EXIT
+          printf '%s' "$ASC_API_KEY_BASE64" | base64 --decode > "$KEY_FILE"
+          chmod 600 "$KEY_FILE"
+          export API_PRIVATE_KEYS_DIR="$RUNNER_TEMP/asc-private-keys"
+          xcrun altool --upload-app --type ios --file "$IPA" --apiKey "$ASC_API_KEY_ID" --apiIssuer "$ASC_API_ISSUER_ID"
+          echo "Upload accepted by Apple's uploader. Check App Store Connect for processing and TestFlight availability."
