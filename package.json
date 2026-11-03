@@ -14,11 +14,7 @@
     "react": "latest",
     "react-dom": "latest",
     "lucide-react": "latest",
-    "@supabase/supabase-js": "2.118.0",
-    "@capacitor/core": "^7.0.0"
+    "@supabase/supabase-js": "2.118.0"
   },
-  "devDependencies": {
-    "@capacitor/cli": "^7.0.0",
-    "@capacitor/ios": "^7.0.0"
-  }
+  "devDependencies": {}
 }
