@@ -10,6 +10,7 @@ on:
       - 'style.css'
       - 'ConsumptionTracker.jsx'
       - 'package.json'
+      - 'package-lock.json'
       - 'capacitor.config.json'
       - '.github/workflows/ios-cloud-build.yml'
 
@@ -28,6 +29,11 @@ jobs:
           node-version: '22'
       - name: Install existing project dependencies
         run: npm install --no-audit --no-fund
+      - name: Upload refreshed dependency lock for review
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-updated-package-lock
+          path: package-lock.json
       - name: Build web assets for iOS
         run: npm run build:ios
       - name: Add iOS platform to existing application
