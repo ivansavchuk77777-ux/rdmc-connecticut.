@@ -6,7 +6,7 @@ on:
       source_run_id:
         description: "Successful signed iOS release GitHub Actions run ID"
         required: true
-        default: "41670163993"
+        default: "41867019061"
         type: string
 
 permissions:
