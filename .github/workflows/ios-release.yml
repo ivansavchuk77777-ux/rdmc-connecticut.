@@ -1,6 +1,9 @@
 name: RDMC signed iOS release
 
 on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/ios-release.yml']
   workflow_dispatch:
 
 permissions:
@@ -97,6 +100,15 @@ jobs:
           end
           project.save
           RUBY
+      - name: Ensure iOS bundle version is newer than Apple Build 5
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUILD_NUMBER="$GITHUB_RUN_NUMBER"
+          test "$BUILD_NUMBER" -gt 5
+          /usr/libexec/PlistBuddy -c "Set :CFBundleVersion $BUILD_NUMBER" ios/App/App/Info.plist \
+            || /usr/libexec/PlistBuddy -c "Add :CFBundleVersion string $BUILD_NUMBER" ios/App/App/Info.plist
+          echo "Prepared RDMC app build number $BUILD_NUMBER"
       - name: Archive signed iPhone release
         shell: bash
         run: |
@@ -120,6 +132,26 @@ jobs:
             -exportOptionsPlist "$RUNNER_TEMP/ExportOptions.plist" \
             -exportPath "$RUNNER_TEMP/rdmc-release"
           test -n "$(find "$RUNNER_TEMP/rdmc-release" -name '*.ipa' -print -quit)"
+      - name: Verify exported RDMC IPA build number
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          import os, plistlib, zipfile
+          from pathlib import Path
+          files = list(Path(os.environ["RUNNER_TEMP"], "rdmc-release").glob("*.ipa"))
+          assert len(files) == 1, f"Expected one IPA, found {len(files)}"
+          with zipfile.ZipFile(files[0]) as archive:
+              paths = [p for p in archive.namelist() if p.startswith("Payload/") and p.endswith(".app/Info.plist") and p.count("/") == 2]
+              assert len(paths) == 1
+              data = plistlib.loads(archive.read(paths[0]))
+          assert data.get("CFBundleIdentifier") == "us.rdmcfairfieldcounty.live"
+          actual = str(data.get("CFBundleVersion"))
+          expected = os.environ["GITHUB_RUN_NUMBER"]
+          assert actual == expected, f"IPA contains build {actual}, expected {expected}"
+          assert int(actual) > 5, "Build number must exceed existing Apple Build 5"
+          print(f"Validated RDMC signed IPA with iOS build {actual}")
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: RDMC-signed-iPhone-release
