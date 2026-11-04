@@ -54,6 +54,19 @@ jobs:
           umask 077
           IPA="$(find "$RUNNER_TEMP/rdmc-upload" -type f -name '*.ipa' -print -quit)"
           [[ -n "$IPA" && -s "$IPA" ]] || { echo "::error::No IPA found in chosen run"; exit 1; }
+          # Verify the signed archive belongs to the registered existing RDMC app.
+          IPA="$IPA" python3 - <<'PY'
+          import os, plistlib, zipfile, sys
+          with zipfile.ZipFile(os.environ["IPA"]) as archive:
+              infos = [p for p in archive.namelist() if p.startswith("Payload/") and p.endswith(".app/Info.plist") and p.count("/") == 2]
+              if len(infos) != 1:
+                  sys.exit("Expected exactly one iOS application Info.plist in the signed IPA")
+              data = plistlib.loads(archive.read(infos[0]))
+              identifier = data.get("CFBundleIdentifier")
+              if identifier != "us.rdmcfairfieldcounty.live":
+                  sys.exit("Unexpected IPA bundle identifier; refusing upload")
+              print("Verified RDMC iPhone bundle identifier:", identifier)
+          PY
           mkdir -p "$RUNNER_TEMP/asc-private-keys"
           KEY_FILE="$RUNNER_TEMP/asc-private-keys/AuthKey_${ASC_API_KEY_ID}.p8"
           trap 'rm -f "$KEY_FILE"' EXIT
