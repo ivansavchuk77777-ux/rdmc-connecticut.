@@ -15,6 +15,7 @@ on:
       - 'package.json'
       - 'package-lock.json'
       - 'capacitor.config.json'
+      - 'scripts/prepare-ios-icon.mjs'
       - '.github/workflows/ios-cloud-build.yml'
 
 permissions:
@@ -51,6 +52,8 @@ jobs:
         run: npx cap add ios
       - name: Sync existing application into iOS project
         run: npx cap sync ios
+      - name: Configure original red devil app icon
+        run: node scripts/prepare-ios-icon.mjs
       - name: Show Xcode and available project files
         run: |
           xcodebuild -version

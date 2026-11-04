@@ -40,6 +40,8 @@ jobs:
         run: cmp IMG_1995.jpg dist/IMG_1995.jpg
       - run: npx cap add ios
       - run: npx cap sync ios
+      - name: Configure original red devil app icon
+        run: node scripts/prepare-ios-icon.mjs
       - name: Install signing in temporary keychain
         env:
           IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
