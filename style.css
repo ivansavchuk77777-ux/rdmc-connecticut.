@@ -71,38 +71,40 @@ header small{font-size:12px;letter-spacing:.7px;line-height:1.3;max-width:195px;
 .consumptionToolbar{display:flex;flex-wrap:wrap;align-items:end;gap:10px}.consumptionToolbar label{display:grid;gap:6px;font-size:13px}.consumptionTracker button,.consumptionTracker select,.consumptionTracker input{font:inherit;border:1px solid #444;border-radius:9px;padding:10px;background:#202020;color:#fff;min-height:44px}.consumptionTracker button{cursor:pointer;font-weight:700}.consumptionTracker button:disabled{opacity:.45;cursor:default}.consumptionTracker input{color-scheme:dark}.consumptionSync{font-size:12px;color:#bbb}.consumptionSummary{background:#221315;border:1px solid #68252a;border-radius:16px;padding:20px;margin:18px 0}.consumptionSummary span,.consumptionSummary small{display:block;color:#ccc}.consumptionSummary b{display:block;font-size:38px;margin:5px 0;color:#ff5860}.consumptionTableWrap{overflow:auto;border:1px solid #444;border-radius:12px;margin:16px 0}.consumptionTable{border-collapse:separate;border-spacing:0;width:100%;min-width:650px;font-size:13px}.consumptionTable caption{text-align:left;padding:12px;color:#ddd}.consumptionTable th,.consumptionTable td{padding:13px 10px;border-top:1px solid #393939;border-right:1px solid #333;text-align:center}.consumptionTable thead th{background:#34171a;color:#fff}.consumptionTable th:first-child{position:sticky;left:0;text-align:left;background:#202020;z-index:1;min-width:110px}.consumptionTable tbody tr:nth-child(even) td{background:#191919}.consumptionTable td.used{color:#ff737a;font-weight:800}.consumptionTable tfoot th,.consumptionTable tfoot td{background:#34171a;font-weight:800}.consumptionForm{display:grid;gap:14px}.consumptionForm h2{margin:0}.consumptionForm label{display:grid;gap:7px;font-size:14px}.consumptionForm small{color:#aaa}.consumptionForm input,.consumptionForm select{width:100%;min-width:0}.consumptionFormPair{display:grid;grid-template-columns:1fr 2fr;gap:12px}.consumptionForm button[type=submit]{background:#c91f2a;justify-content:center}.consumptionHistory{margin:24px 0}.consumptionHistory summary{cursor:pointer;padding:12px 0;font-weight:700}.consumptionHistory small{display:block;color:#aaa;margin:10px 0}.consumptionTracker :focus-visible{outline:2px solid #ff737a;outline-offset:3px}
 
 
-/* RDMC Live top header only. Hero and middle section remain unchanged. */
+
+/* RDMC Live: header-only layout. No changes to hero/banner. */
+@media(min-width:701px){main{max-width:1100px}}
 main > header{
- position:relative;top:auto;z-index:3;
- display:grid;grid-template-columns:180px 64px minmax(220px,1fr) 58px auto 24px;
- gap:12px;align-items:center;
- height:auto;min-height:128px;padding:22px 20px;
- overflow:visible;
- border-bottom:1px solid #2b2b2b;background:#101010;
+ position:relative;top:auto;display:grid;
+ grid-template-columns:minmax(110px,150px) 58px minmax(175px,1fr) 50px minmax(120px,max-content) 22px;
+ column-gap:12px;row-gap:8px;align-items:center;
+ width:100%;height:auto;min-height:112px;padding:16px 18px;
+ overflow:visible;background:#101010;border-bottom:1px solid #2b2b2b;
 }
 main > header .languageControl{grid-column:1;min-width:0}
-main > header .clubLogo{grid-column:2;width:64px;height:64px;flex:none}
-main > header .clubHeading{grid-column:3;display:flex;flex-direction:column;justify-content:center;min-width:0;max-width:none}
-main > header .clubHeading b{display:block;font-size:22px;line-height:1.25;white-space:nowrap;letter-spacing:.3px;margin:0 0 5px}
-main > header .clubHeading small{display:block;font-size:13px;line-height:1.4;white-space:nowrap;letter-spacing:0;color:#eee;max-width:none}
-main > header .clubCoin{grid-column:4;width:58px;height:58px;object-fit:contain;margin:0}
+main > header .clubLogo{grid-column:2;width:58px;height:58px;flex:none}
+main > header .clubHeading{grid-column:3;min-width:0;max-width:none;display:flex;flex-direction:column;justify-content:center}
+main > header .clubHeading b{display:block;margin:0 0 5px;font-size:20px;line-height:1.3;white-space:nowrap;letter-spacing:0}
+main > header .clubHeading small{display:block;font-size:12px;line-height:1.45;white-space:nowrap;letter-spacing:0;max-width:none;color:#eee}
+main > header .clubCoin{grid-column:4;width:50px;height:50px;object-fit:contain;margin:0}
 main > header .loginGroup{grid-column:5;min-width:0}
 main > header .bell{grid-column:6;margin:0}
-@media(max-width:950px){
- main > header{grid-template-columns:155px 54px minmax(170px,1fr) 44px auto 22px;gap:9px;padding:18px 12px}
- main > header .clubLogo{width:54px;height:54px}
- main > header .clubHeading b{font-size:19px}
- main > header .clubHeading small{font-size:11px}
- main > header .clubCoin{width:44px;height:44px}
+@media(max-width:800px){
+ main > header{grid-template-columns:110px 46px minmax(150px,1fr) 38px max-content 18px;column-gap:7px;padding:14px 10px}
+ main > header .clubLogo{width:46px;height:46px}
+ main > header .clubHeading b{font-size:17px}
+ main > header .clubHeading small{font-size:10px}
+ main > header .clubCoin{width:38px;height:38px}
+ main > header .memberLogin,main > header .brotherLogin{padding:8px;font-size:10px}
 }
-@media(max-width:690px){
- main > header{grid-template-columns:48px minmax(125px,1fr) 34px auto;grid-template-rows:auto auto;gap:9px;padding:14px 10px}
+@media(max-width:700px){
+ main > header{grid-template-columns:48px minmax(115px,1fr) 30px max-content;grid-template-rows:auto auto;gap:8px;padding:12px 10px}
  main > header .languageControl{grid-column:1 / -1;grid-row:1}
  main > header .clubLogo{grid-column:1;grid-row:2;width:48px;height:48px}
  main > header .clubHeading{grid-column:2;grid-row:2}
- main > header .clubHeading b{font-size:16px}
- main > header .clubHeading small{font-size:10px}
- main > header .clubCoin{grid-column:3;grid-row:2;width:34px;height:34px}
+ main > header .clubHeading b{font-size:15px}
+ main > header .clubHeading small{font-size:9px}
+ main > header .clubCoin{grid-column:3;grid-row:2;width:30px;height:30px}
  main > header .loginGroup{grid-column:4;grid-row:2}
  main > header .bell{display:none}
 }
