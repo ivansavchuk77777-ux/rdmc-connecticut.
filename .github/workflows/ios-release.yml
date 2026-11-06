@@ -43,6 +43,10 @@ jobs:
         run: cmp IMG_1995.jpg dist/IMG_1995.jpg
       - run: npx cap add ios
       - run: npx cap sync ios
+      - name: Configure voice control permissions
+        run: |
+          /usr/libexec/PlistBuddy -c "Add :NSMicrophoneUsageDescription string RDMC uses your microphone when you turn on voice control." ios/App/App/Info.plist
+          /usr/libexec/PlistBuddy -c "Add :NSSpeechRecognitionUsageDescription string Recognize spoken commands for RDMC navigation, messages, and member approvals." ios/App/App/Info.plist
       - name: Set original red devil iPhone home screen icon
         run: node scripts/prepare-ios-icon.mjs
       - name: Install signing in temporary keychain

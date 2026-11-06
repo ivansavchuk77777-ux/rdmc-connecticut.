@@ -1,0 +1,6 @@
+.rdmc-voice {display:flex;align-items:center;gap:.65rem;flex-wrap:wrap;padding:.45rem .8rem;color:#eee;background:#181416;font:500 14px/1.4 system-ui,sans-serif}
+.rdmc-voice button {background:#2b2023;color:#fff;border:1px solid #97606a;border-radius:.45rem;padding:.45rem .8rem;cursor:pointer;font:inherit}
+.rdmc-voice button[aria-pressed=true] {background:#792138}
+.rdmc-voice button:focus-visible {outline:2px solid white;outline-offset:2px}
+.rdmc-voice span {flex:1;min-width:10em}
+.rdmc-voice span:empty {display:none}
