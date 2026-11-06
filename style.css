@@ -89,3 +89,18 @@ header .clubHeading small{display:block;font-size:12px;line-height:1.25;letter-s
 header .clubCoin{width:52px;height:52px;flex:0 0 52px;margin:0 4px}
 @media(max-width:760px){header{flex-wrap:wrap;row-gap:10px;padding:12px}header .clubHeading{flex:1 1 160px;max-width:none}header .clubCoin{width:42px;height:42px;flex-basis:42px}header .loginGroup{flex:0 1 auto}header .clubHeading small{font-size:11px}}
 @media(max-width:430px){header .clubHeading{flex:1 1 120px}header .clubCoin{width:32px;height:32px;flex-basis:32px}header .clubHeading b{font-size:15px}header .clubHeading small{font-size:10px}}
+
+/* Final desktop Live header: single-line chapter label and no overflow. */
+@media(min-width:761px){
+ main{max-width:1100px}
+ header{min-height:104px;height:auto;display:flex;flex-wrap:nowrap;gap:12px;padding:14px 18px}
+ header .languageControl{flex:0 0 auto}
+ header .clubLogo{flex:0 0 58px}
+ header .clubHeading{flex:1 1 260px;min-width:220px;max-width:none}
+ header .clubHeading b{font-size:22px;line-height:1.15;white-space:nowrap}
+ header .clubHeading small{font-size:13px;line-height:1.25;white-space:normal;overflow-wrap:normal;max-width:none}
+ header .clubCoin{flex:0 0 54px;width:54px;height:54px;margin:0 4px}
+ header .loginGroup{flex:0 0 auto;min-width:0}
+ header .bell{flex:0 0 22px;margin-left:0}
+}
+@media(min-width:761px) and (max-width:1000px){header{gap:8px;padding:12px}header .clubHeading{min-width:180px;flex-basis:180px}header .clubHeading b{font-size:19px}header .clubHeading small{font-size:11px}header .clubCoin{width:42px;height:42px;flex-basis:42px}}
