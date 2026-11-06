@@ -41,6 +41,9 @@ jobs:
       - run: npm run build:ios
       - name: Verify original devil artwork and corrected chapter coin
         run: |
+          # Verify the iPhone bundle includes the corrected member header.
+          grep -Fql 'appHeaderIdentity' dist/assets/*.js
+          grep -Fql '.memberAppHeader .appHeaderIdentity' dist/assets/*.css
           cmp IMG_1995.jpg dist/IMG_1995.jpg
           cmp rdmc-coin-transparent.png dist/rdmc-coin-transparent.png
       - run: npx cap add ios
