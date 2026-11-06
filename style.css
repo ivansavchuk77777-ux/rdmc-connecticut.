@@ -104,3 +104,11 @@ header .clubCoin{width:52px;height:52px;flex:0 0 52px;margin:0 4px}
  header .bell{flex:0 0 22px;margin-left:0}
 }
 @media(min-width:761px) and (max-width:1000px){header{gap:8px;padding:12px}header .clubHeading{min-width:180px;flex-basis:180px}header .clubHeading b{font-size:19px}header .clubHeading small{font-size:11px}header .clubCoin{width:42px;height:42px;flex-basis:42px}}
+
+/* Header overflow repair: fixed text lines, no clipped RED or Connecticut. */
+header{height:auto!important;min-height:128px!important;overflow:visible!important;align-items:center!important}
+header .clubHeading{display:flex!important;flex-direction:column!important;justify-content:center!important;align-self:center!important;flex:1 1 190px!important;min-width:190px!important;max-width:none!important;overflow:visible!important}
+header .clubHeading b{display:block!important;font-size:20px!important;line-height:1.2!important;white-space:nowrap!important;margin:0 0 6px!important}
+header .clubHeading small{display:block!important;font-size:12px!important;line-height:1.45!important;white-space:nowrap!important;letter-spacing:.2px!important;overflow:visible!important}
+header .clubCoin{flex:0 0 48px!important;width:48px!important;height:48px!important;margin:0 8px!important}
+@media(max-width:760px){header{flex-wrap:wrap!important;min-height:110px!important}header .clubHeading{flex:1 1 145px!important;min-width:145px!important}header .clubHeading b{font-size:17px!important}header .clubHeading small{font-size:10px!important}header .clubCoin{width:34px!important;height:34px!important;flex-basis:34px!important;margin:0!important}}
