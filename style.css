@@ -74,37 +74,40 @@ header small{font-size:12px;letter-spacing:.7px;line-height:1.3;max-width:195px;
 
 /* RDMC Live: header-only layout. No changes to hero/banner. */
 @media(min-width:701px){main{max-width:1100px}}
-main > header{
- position:relative;top:auto;display:grid;
- grid-template-columns:minmax(110px,150px) 58px minmax(175px,1fr) 50px minmax(120px,max-content) 22px;
- column-gap:12px;row-gap:8px;align-items:center;
- width:100%;height:auto;min-height:112px;padding:16px 18px;
- overflow:visible;background:#101010;border-bottom:1px solid #2b2b2b;
+main > header {
+  position: relative;
+  top: auto;
+  display: grid;
+  grid-template-columns: max-content auto max-content auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 12px;
+  height: auto;
+  min-height: 100px;
+  padding: 16px;
 }
-main > header .languageControl{grid-column:1;min-width:0}
-main > header .clubLogo{grid-column:2;width:58px;height:58px;flex:none}
-main > header .clubHeading{grid-column:3;min-width:0;max-width:none;display:flex;flex-direction:column;justify-content:center}
-main > header .clubHeading b{display:block;margin:0 0 5px;font-size:20px;line-height:1.3;white-space:nowrap;letter-spacing:0}
-main > header .clubHeading small{display:block;font-size:12px;line-height:1.45;white-space:nowrap;letter-spacing:0;max-width:none;color:#eee}
-main > header .clubCoin{grid-column:4;width:50px;height:50px;object-fit:contain;margin:0}
-main > header .loginGroup{grid-column:5;min-width:0}
-main > header .bell{grid-column:6;margin:0}
-@media(max-width:800px){
- main > header{grid-template-columns:110px 46px minmax(150px,1fr) 38px max-content 18px;column-gap:7px;padding:14px 10px}
- main > header .clubLogo{width:46px;height:46px}
- main > header .clubHeading b{font-size:17px}
- main > header .clubHeading small{font-size:10px}
- main > header .clubCoin{width:38px;height:38px}
- main > header .memberLogin,main > header .brotherLogin{padding:8px;font-size:10px}
+main > header .clubHeading { display: grid; gap: 3px; }
+main > header .clubHeading b,
+main > header .clubHeading small { display: block; white-space: nowrap; line-height: 1.35; }
+main > header .clubCoin { width: 48px; height: 48px; object-fit: contain; }
+main > header .loginGroup { justify-self: end; flex-wrap: wrap; justify-content: flex-end; }
+main > header .memberLogin { max-width: 100%; overflow-wrap: anywhere; }
+@media (max-width: 900px) {
+  main > header {
+    grid-template-areas: "logo heading coin ." "language controls controls controls";
+    grid-template-columns: auto max-content auto minmax(0, 1fr);
+    gap: 10px;
+  }
+  main > header .clubLogo { grid-area: logo; }
+  main > header .clubHeading { grid-area: heading; }
+  main > header .clubCoin { grid-area: coin; }
+  main > header .languageControl { grid-area: language; }
+  main > header .loginGroup { grid-area: controls; }
+  main > header .bell { display: none; }
 }
-@media(max-width:700px){
- main > header{grid-template-columns:48px minmax(115px,1fr) 30px max-content;grid-template-rows:auto auto;gap:8px;padding:12px 10px}
- main > header .languageControl{grid-column:1 / -1;grid-row:1}
- main > header .clubLogo{grid-column:1;grid-row:2;width:48px;height:48px}
- main > header .clubHeading{grid-column:2;grid-row:2}
- main > header .clubHeading b{font-size:15px}
- main > header .clubHeading small{font-size:9px}
- main > header .clubCoin{grid-column:3;grid-row:2;width:30px;height:30px}
- main > header .loginGroup{grid-column:4;grid-row:2}
- main > header .bell{display:none}
+@media (max-width: 520px) {
+  main > header {
+    grid-template-areas: "logo heading coin ." "language language language language" "controls controls controls controls";
+    padding: 12px;
+  }
+  main > header .loginGroup { justify-self: start; justify-content: flex-start; margin-left: 0; }
 }
