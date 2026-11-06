@@ -97,6 +97,7 @@ jobs:
           abort 'Expected exactly one RDMC application target' unless apps.length == 1
           apps.first.build_configurations.each do |config|
             settings = config.build_settings
+            settings['IPHONEOS_DEPLOYMENT_TARGET'] = '15.0'
             settings['CODE_SIGN_STYLE'] = 'Manual'
             settings['DEVELOPMENT_TEAM'] = 'B852HHFN2S'
             settings['CODE_SIGN_IDENTITY'] = 'Apple Distribution'
@@ -152,6 +153,9 @@ jobs:
               assert len(paths) == 1
               data = plistlib.loads(archive.read(paths[0]))
           assert data.get("CFBundleIdentifier") == "us.rdmcfairfieldcounty.live"
+          minimum_os = data.get("MinimumOSVersion", "")
+          assert minimum_os == "15.0", f"Unexpected iOS deployment target: {minimum_os}"
+          print(f"Verified minimum iOS {minimum_os} in the signed app")
           actual = str(data.get("CFBundleVersion"))
           expected = os.environ["GITHUB_RUN_NUMBER"]
           assert actual == expected, f"IPA contains build {actual}, expected {expected}"
