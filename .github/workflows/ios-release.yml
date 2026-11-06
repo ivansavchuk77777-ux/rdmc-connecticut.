@@ -39,8 +39,10 @@ jobs:
       - run: npm install --no-save --package-lock=false --no-audit --no-fund @capacitor/core@^7 @capacitor/cli@^7 @capacitor/ios@^7
       - run: node --test consumption.test.mjs
       - run: npm run build:ios
-      - name: Preserve original devil artwork
-        run: cmp IMG_1995.jpg dist/IMG_1995.jpg
+      - name: Verify original devil artwork and corrected chapter coin
+        run: |
+          cmp IMG_1995.jpg dist/IMG_1995.jpg
+          cmp rdmc-coin-transparent.png dist/rdmc-coin-transparent.png
       - run: npx cap add ios
       - run: npx cap sync ios
       - name: Configure voice control permissions
