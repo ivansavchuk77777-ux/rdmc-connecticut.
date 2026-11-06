@@ -73,32 +73,103 @@ header small{font-size:12px;letter-spacing:.7px;line-height:1.3;max-width:195px;
 
 .clubHeading{min-width:0;flex:1}.clubCoin{width:38px;height:38px;object-fit:contain;flex:0 0 38px}.clubLogo img{display:block;width:100%;height:100%;object-fit:contain}@media(max-width:430px){header{gap:7px;padding:10px}.clubLogo{width:44px;height:44px;flex-basis:44px}.clubCoin{width:30px;height:30px;flex-basis:30px}.clubHeading b{font-size:15px}.clubHeading small{font-size:8px;letter-spacing:.7px}}
 
-/* Size each row from its contents, including the iPhone safe area. */
-main > .memberAppHeader {
+/* RDMC iPhone header: two clearly defined rows, safe-area aware.
+   All original logos, coin artwork and account actions are retained. */
+main > header.memberAppHeader {
+  position: relative;
+  top: auto;
   display: grid;
-  grid-template-columns: auto 1fr;
-  grid-template-areas: "logo identity" "controls controls";
+  grid-template-columns: 52px minmax(0, 1fr);
+  grid-template-areas: "logo identity" "language controls";
   align-items: center;
+  gap: 12px 10px;
   height: auto;
-  gap: 10px;
-  padding: max(14px, env(safe-area-inset-top)) 14px 14px;
+  min-height: 0;
+  padding: calc(14px + env(safe-area-inset-top, 0px)) 14px 14px;
+  overflow: visible;
 }
-.memberAppHeader .clubLogo { grid-area: logo; }
+.memberAppHeader .clubLogo {
+  grid-area: logo;
+  width: 52px;
+  height: 52px;
+  flex: none;
+  align-self: center;
+}
 .memberAppHeader .appHeaderIdentity {
   grid-area: identity;
   display: flex;
   align-items: center;
-  gap: 10px;
+  justify-content: space-between;
+  gap: 8px;
+  min-width: 0;
+}
+.memberAppHeader .appHeaderText {
+  min-width: 0;
+  flex: 1 1 auto;
 }
 .memberAppHeader .appHeaderText b,
 .memberAppHeader .appHeaderText small {
   display: block;
+  white-space: normal;
   max-width: none;
-  white-space: nowrap;
-  line-height: 1.35;
+  line-height: 1.25;
+  overflow-wrap: normal;
 }
-.memberAppHeader .appHeaderText b { font-size: 19px; }
-.memberAppHeader .appHeaderText small { font-size: 11px; }
-.memberAppHeader .languageControl { grid-column: 1 / -1; grid-row: 2; }
-.memberAppHeader .loginGroup { grid-column: 1 / -1; grid-row: 3; justify-self: start; margin: 0; flex-wrap: wrap; }
-.memberAppHeader .bell { grid-column: 2; grid-row: 2; justify-self: end; }
+.memberAppHeader .appHeaderText b {
+  font-size: clamp(16px, 4.7vw, 20px);
+  letter-spacing: .3px;
+}
+.memberAppHeader .appHeaderText small {
+  font-size: clamp(10px, 2.7vw, 12px);
+  letter-spacing: .2px;
+}
+.memberAppHeader .clubCoin {
+  display: block;
+  flex: 0 0 44px;
+  width: 44px;
+  height: 44px;
+  object-fit: contain;
+}
+.memberAppHeader .languageControl {
+  grid-area: language;
+  grid-column: auto;
+  grid-row: auto;
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.memberAppHeader .languageControl select {
+  min-width: 0;
+  max-width: 100%;
+}
+.memberAppHeader .loginGroup {
+  grid-area: controls;
+  grid-column: auto;
+  grid-row: auto;
+  display: flex;
+  flex-wrap: wrap;
+  min-width: 0;
+  justify-self: end;
+  justify-content: flex-end;
+  gap: 6px;
+  margin: 0;
+}
+.memberAppHeader .loginGroup button {
+  max-width: 100%;
+  min-height: 36px;
+  overflow-wrap: anywhere;
+  white-space: normal;
+}
+.memberAppHeader .bell { display: none; }
+@media (max-width: 410px) {
+  main > header.memberAppHeader {
+    grid-template-columns: 48px minmax(0,1fr);
+    grid-template-areas: "logo identity" "language language" "controls controls";
+    padding: calc(12px + env(safe-area-inset-top, 0px)) 12px 12px;
+    gap: 10px;
+  }
+  .memberAppHeader .clubLogo { width: 48px; height: 48px; }
+  .memberAppHeader .clubCoin { width: 38px; height: 38px; flex-basis: 38px; }
+  .memberAppHeader .loginGroup { justify-self: start; justify-content: flex-start; }
+}
