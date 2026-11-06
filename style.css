@@ -118,3 +118,48 @@ main > header .memberLogin { max-width: 100%; overflow-wrap: anywhere; }
   main > header .clubCoin { width: 38px; height: 38px; }
   main > header .loginGroup { justify-self: start; justify-content: flex-start; margin-left: 0; }
 }
+
+/* RDMC Live header: compact, self-contained layout for actual member app. */
+main > header {
+  position: relative !important;
+  top: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  overflow: visible !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) 64px minmax(155px,1.2fr) 48px minmax(0,1fr) !important;
+  grid-template-areas: "language logo heading coin controls" !important;
+  align-items: center !important;
+  gap: 10px !important;
+  padding: 16px 14px !important;
+}
+main > header .languageControl {grid-area:language;min-width:0;display:flex;align-items:center;gap:4px}
+main > header .languageControl select {max-width:100%;min-width:0}
+main > header .clubLogo {grid-area:logo}
+main > header .clubHeading {grid-area:heading;align-self:center;min-width:0;display:flex;flex-direction:column;gap:5px}
+main > header .clubHeading b {display:block;white-space:normal;font-size:19px;line-height:1.2;margin:0}
+main > header .clubHeading small {display:block;white-space:normal;font-size:12px;line-height:1.45;margin:0;max-width:none}
+main > header .clubCoin {grid-area:coin;width:46px;height:46px;object-fit:contain;align-self:center}
+main > header .loginGroup {grid-area:controls;min-width:0;justify-self:end;display:flex;flex-wrap:wrap;gap:6px}
+main > header .bell {display:none}
+@media(max-width:700px) {
+  main > header {
+    grid-template-columns: 58px minmax(0,1fr) 44px !important;
+    grid-template-areas: "logo heading coin" "language controls controls" !important;
+    gap: 10px 12px !important;
+    padding: 18px 14px 14px !important;
+  }
+  main > header .clubLogo {width:58px;height:58px;flex:none}
+  main > header .clubHeading b {font-size:20px;line-height:1.2}
+  main > header .clubHeading small {font-size:12px;line-height:1.4}
+  main > header .clubCoin {width:44px;height:44px}
+  main > header .languageControl {align-self:center}
+  main > header .loginGroup {justify-self:end;justify-content:flex-end}
+}
+@media(max-width:380px) {
+  main > header {grid-template-columns:48px minmax(0,1fr) 38px !important;gap:8px !important;padding:14px 10px !important}
+  main > header .clubLogo {width:48px;height:48px}
+  main > header .clubHeading b {font-size:18px}
+  main > header .clubHeading small {font-size:11px}
+  main > header .clubCoin {width:38px;height:38px}
+}
