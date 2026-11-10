@@ -39,6 +39,7 @@ jobs:
           cp install-vivora.ps1 dist/
           cp CNAME dist/CNAME
           mkdir -p dist/website
+          cp website/*.jpeg dist/website/
           cp website/index.html website/sitemap.xml website/robots.txt website/voice*.mjs website/voice.css dist/website/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
