@@ -1,29 +1,29 @@
-# RDMC Fairfield County Live — iOS release handoff
+# RDMC Fairfield County Live — current iOS release status
 
-This is the **existing** React/Vite/Supabase RDMC Live app, not a new project. Keep the original `IMG_1995.jpg` logo unchanged. The iOS packaging work remains on `app-store-ios-preparation`; the public website on `main` has not been changed by this branch.
+Updated November 12, 2026.
 
-## Verified November 3, 2026
+This is the **existing** RDMC Fairfield County Live app, not a new app. The iOS release branch is `app-store-ios-preparation`. Preserve the original Red Devil logo `IMG_1995.jpg`.
 
-- **Signed App Store iPhone release: PASSED** in GitHub Actions run [41670163993](https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/41670163993).
-- The workflow completed dependency installation, consumption tests, web build, original-logo comparison, Capacitor iOS generation/sync, Release archive, IPA export, and artifact upload successfully.
-- Artifact: `RDMC-signed-iPhone-release` (2,661,772 bytes; artifact ID `13249245280`), expires **November 10, 2026**. [Download from the workflow run](https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/41670163993) while signed in to GitHub.
-- App identifier: `us.rdmcfairfieldcounty.live`; Apple Team: `B852HHFN2S`.
-- The signing credentials are held as encrypted GitHub Actions secrets, not source files.
-- **Not yet done:** IPA upload to App Store Connect; Apple processing; TestFlight distribution; physical iPhone acceptance test; App Store review and publication. A passing build does not imply Apple acceptance.
+## Verified release milestones
 
-## Next action: upload the existing IPA to TestFlight
+- **Signed iOS build 12 succeeded** November 6, 2026: https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/42301602025
+- **Upload of signed build 12 succeeded** November 6, 2026: https://github.com/ivansavchuk77777-ux/rdmc-connecticut./actions/runs/42302003521
+- The uploader log reports **“UPLOAD SUCCEEDED with no errors”** and confirms bundle ID `us.rdmcfairfieldcounty.live` with build number **12**.
+- Apple Team: `B852HHFN2S`.
+- **Not independently verified:** Apple's processing result, TestFlight availability, physical iPhone acceptance, App Store pricing, subscription configuration, review approval, or publication.
 
-1. In the existing GitHub Actions run above, open artifact `RDMC-signed-iPhone-release` and download its ZIP. Extract the `.ipa` file. Do not rename or edit its contents.
-2. In [App Store Connect](https://appstoreconnect.apple.com/apps), open the existing **RDMC Fairfield County Live** app (do not register another app).
-3. Upload the IPA using **Apple Transporter on a Mac**, **Xcode Organizer**, or a properly authorized macOS CI upload integration. App Store Connect's normal web app page is not a general-purpose IPA uploader. Windows alone cannot use Apple Transporter for macOS; an authorized macOS cloud runner with App Store Connect API credentials is an alternative.
-4. Wait for Apple processing, address any validation messages, and enable an internal TestFlight tester.
-5. Test login/member authorization, account deletion, data isolation (including the consumption tracker), logo/app icon, navigation, notifications, and purchases on a physical iPhone. Confirm the app is more than a simple website wrapper.
-6. Before requesting review, verify support/privacy-policy URLs, privacy disclosures, actual app screenshots, review/demo access, account deletion, permissions to use brand imagery, and Apple's payment rules. Paid download or monthly subscriptions have **not** been verified as configured.
-7. Submit for review only after TestFlight passes and the account holder confirms the final listing and commercial terms.
+## App Store submission preparation
 
-## Important release constraints
+The current listing copy, reviewer notes, tester checklist, and unresolved submission blockers are in [APP_STORE_SUBMISSION_2026.md](./APP_STORE_SUBMISSION_2026.md).
 
-- Do not publish an untested binary to the App Store.
-- Never place Apple private keys, P12s, provisioning profiles, API keys, or passwords in commits, PR descriptions, or issue comments.
-- This is a draft PR; do not merge the preparation branch into the public website until its changes are reviewed.
-- The `.ipa` is time-limited in Actions; rerun the existing signed release workflow if the artifact expires.
+**Key blockers:** verify Apple processing and iPhone testing; implement/verify account deletion; resolve the currently disabled in-app subscription control if a $1.99/month subscription is planned; publish accurate support and privacy pages; provide genuine screenshots and private review credentials; confirm App Store pricing.
+
+## Next actions
+
+1. Open https://appstoreconnect.apple.com/apps and select the existing RDMC Fairfield County Live app (Apple App ID 6829960532, verify there).
+2. Confirm build **12** appears under TestFlight or select a newer processed build.
+3. Complete iPhone QA and resolve the release blockers in the submission package.
+4. Fill App Store Connect metadata, pricing, privacy disclosures, review credentials, and screenshots.
+5. Submit only after testing and explicit final approval. **Do not create another app.**
+
+Signing/API keys and passwords must remain in encrypted secrets or Apple's secure review fields, never committed to the repository.
