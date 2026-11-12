@@ -173,3 +173,8 @@ main > header.memberAppHeader {
   .memberAppHeader .clubCoin { width: 38px; height: 38px; flex-basis: 38px; }
   .memberAppHeader .loginGroup { justify-self: start; justify-content: flex-start; }
 }
+
+/* Keep app controls clear of iPhone status and home indicator areas. */
+main > header { padding-top: calc(16px + env(safe-area-inset-top, 0px)); }
+main { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+nav { height: calc(78px + env(safe-area-inset-bottom, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
