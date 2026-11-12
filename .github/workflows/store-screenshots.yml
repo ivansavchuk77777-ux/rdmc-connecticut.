@@ -1,0 +1,56 @@
+name: Capture RDMC App Store screenshots
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/store-screenshots.yml']
+permissions:
+  contents: read
+jobs:
+  capture:
+    runs-on: macos-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: app-store-ios-preparation
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci --no-audit --no-fund
+      - run: npm install --no-save --package-lock=false @capacitor/cli@^7 @capacitor/ios@^7
+      - run: npm run build:ios && npx cap add ios && npx cap sync ios
+      - name: Build unsigned simulator app
+        run: xcodebuild -workspace ios/App/App.xcworkspace -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath /tmp/rdmc-simulator CODE_SIGNING_ALLOWED=NO build
+      - name: Capture the signed-out dashboard on both devices
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p screenshots
+          xcrun simctl list devices available -j > /tmp/rdmc-devices.json
+          python3 - <<'PY' > /tmp/rdmc-devices.txt
+          import json, re
+          devices = json.load(open('/tmp/rdmc-devices.json'))['devices']
+          ios = [d for key, group in devices.items() if 'SimRuntime.iOS-' in key for d in group if d.get('isAvailable')]
+          for label, pattern in [('iPhone', r'iPhone (?:17 Pro|16 Pro|15 Pro|17|16|15)$'), ('iPad', r'iPad (?:Pro|Air) 13-inch')]:
+              device = next((d for d in ios if re.match(pattern, d['name'])), None)
+              if device is None:
+                  raise RuntimeError(f'No supported {label} simulator: {[d["name"] for d in ios]}')
+              print(label, device['udid'])
+          PY
+          while read -r label udid; do
+            xcrun simctl boot "$udid"
+            xcrun simctl bootstatus "$udid" -b
+            xcrun simctl status_bar "$udid" override --time '9:41'
+            xcrun simctl install "$udid" /tmp/rdmc-simulator/Build/Products/Debug-iphonesimulator/App.app
+            xcrun simctl launch "$udid" us.rdmcfairfieldcounty.live
+            sleep 15
+            xcrun simctl io "$udid" screenshot "screenshots/$label.png"
+            sips -g pixelWidth -g pixelHeight "screenshots/$label.png"
+            xcrun simctl shutdown "$udid"
+          done < /tmp/rdmc-devices.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rdmc-store-screenshots
+          path: screenshots/*.png
+          if-no-files-found: error
