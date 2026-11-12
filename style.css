@@ -177,3 +177,8 @@ main > header .bell { display: none; }
   main > header .clubHeading small { font-size: 10px; }
   main > header .loginGroup { justify-self: start; justify-content: flex-start; }
 }
+
+/* Keep app controls clear of iPhone status and home indicator areas. */
+main > header { padding-top: calc(16px + env(safe-area-inset-top, 0px)); }
+main { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
+nav { height: calc(78px + env(safe-area-inset-bottom, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
