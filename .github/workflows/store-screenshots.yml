@@ -38,14 +38,31 @@ jobs:
                   raise RuntimeError(f'No supported {label} simulator: {[d["name"] for d in ios]}')
               print(label, device['udid'])
           PY
+          cat > /tmp/rdmc-screen.swift <<'SWIFT'
+          import AppKit
+          import Vision
+          let url = URL(fileURLWithPath: CommandLine.arguments[1])
+          let request = VNRecognizeTextRequest()
+          try VNImageRequestHandler(url: url).perform([request])
+          let labels = (request.results ?? []).compactMap { $0.topCandidates(1).first?.string.lowercased() }
+          exit(labels.contains(where: { $0.contains("members only") || $0.contains("member login") }) ? 0 : 1)
+          SWIFT
+          swiftc /tmp/rdmc-screen.swift -o /tmp/rdmc-screen
           while read -r label udid; do
             xcrun simctl boot "$udid"
             xcrun simctl bootstatus "$udid" -b
             xcrun simctl status_bar "$udid" override --time '9:41'
             xcrun simctl install "$udid" /tmp/rdmc-simulator/Build/Products/Debug-iphonesimulator/App.app
             xcrun simctl launch "$udid" us.rdmcfairfieldcounty.live
-            sleep 15
-            xcrun simctl io "$udid" screenshot "screenshots/$label.png"
+            for attempt in {1..24}; do
+              sleep 5
+              xcrun simctl io "$udid" screenshot "screenshots/$label.png"
+              if /tmp/rdmc-screen "screenshots/$label.png"; then break; fi
+              if [[ "$attempt" == 12 ]]; then
+                xcrun simctl launch --terminate-running-process "$udid" us.rdmcfairfieldcounty.live
+              fi
+            done
+            /tmp/rdmc-screen "screenshots/$label.png" || { echo "$label never displayed the member screen"; exit 1; }
             sips -g pixelWidth -g pixelHeight "screenshots/$label.png"
             xcrun simctl shutdown "$udid"
           done < /tmp/rdmc-devices.txt
