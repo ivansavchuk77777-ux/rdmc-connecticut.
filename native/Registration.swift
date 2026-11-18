@@ -6,7 +6,7 @@ import StoreKit
 final class RDMCRegistrationPlugin: CAPPlugin, CAPBridgedPlugin {
     let identifier = "RDMCRegistrationPlugin"
     let jsName = "RDMCRegistration"
-    let pluginMethods = ["status", "purchase", "restore"].map {
+    let pluginMethods: [CAPPluginMethod] = ["status", "purchase", "restore"].compactMap {
         CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise)
     }
     private let productID = "us.rdmcfairfieldcounty.live.registration"
