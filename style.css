@@ -178,3 +178,6 @@ main > header.memberAppHeader {
 main > header { padding-top: calc(16px + env(safe-area-inset-top, 0px)); }
 main { padding-bottom: calc(92px + env(safe-area-inset-bottom, 0px)); }
 nav { height: calc(78px + env(safe-area-inset-bottom, 0px)); padding-bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
+
+.reviewNotice{padding:6px 12px;text-align:center;color:#fff;background:#51252a;font-size:14px}
+body:has(.reviewNotice) .sol-live-launcher{display:none}
