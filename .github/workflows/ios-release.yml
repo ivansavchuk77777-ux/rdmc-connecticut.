@@ -54,6 +54,8 @@ jobs:
           /usr/libexec/PlistBuddy -c "Add :NSSpeechRecognitionUsageDescription string Recognize spoken commands for RDMC navigation, messages, and member approvals." ios/App/App/Info.plist
       - name: Set original red devil iPhone home screen icon
         run: node scripts/prepare-ios-icon.mjs
+      - name: Verify native registration is included in the app target
+        run: grep -Fq "Registration.swift in Sources" ios/App/App.xcodeproj/project.pbxproj
       - name: Install signing in temporary keychain
         env:
           IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
