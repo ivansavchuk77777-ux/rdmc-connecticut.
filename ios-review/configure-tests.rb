@@ -12,7 +12,7 @@ group = project.main_group.new_group('RegistrationUITests', 'RegistrationUITests
 test.source_build_phase.add_file_reference(group.new_file(files.first))
 test.resources_build_phase.add_file_reference(group.new_file(files.last))
 test.build_configurations.each do |config|
-  config.build_settings.merge!('GENERATE_INFOPLIST_FILE'=>'YES','PRODUCT_BUNDLE_IDENTIFIER'=>'us.rdmcfairfieldcounty.live.registration-tests','TEST_TARGET_NAME'=>app.name,'SWIFT_VERSION'=>'5.0','TARGETED_DEVICE_FAMILY'=>'1,2')
+  config.build_settings.merge!('PRODUCT_NAME'=>'RegistrationUITests','GENERATE_INFOPLIST_FILE'=>'YES','PRODUCT_BUNDLE_IDENTIFIER'=>'us.rdmcfairfieldcounty.live.registration-tests','TEST_TARGET_NAME'=>app.name,'SWIFT_VERSION'=>'5.0','TARGETED_DEVICE_FAMILY'=>'1,2')
 end
 project.save
 scheme = Xcodeproj::XCScheme.new
