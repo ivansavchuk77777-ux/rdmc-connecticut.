@@ -27,8 +27,14 @@ final class RegistrationUITests: XCTestCase {
         if app.buttons["Done"].exists { app.buttons["Done"].tap() }
         let create = button("Create Account (Owner Approval Required)")
         create.tap()
-        let buy = button("Register for $1.99")
-        XCTAssertTrue(buy.waitForExistence(timeout: 35))
+        let buy = web.buttons.matching(NSPredicate(format: "label BEGINSWITH %@ AND label CONTAINS %@", "Register for ", "1.99")).firstMatch
+        guard buy.waitForExistence(timeout: 35) else {
+            // Only report purchase-screen labels for this signed-out synthetic fixture.
+            let labels = web.buttons.allElementsBoundByIndex.map(\.label)
+            let messages = web.staticTexts.allElementsBoundByIndex.map(\.label)
+            XCTFail("Registration screen: buttons=\(labels), messages=\(messages)")
+            return
+        }
         XCTAssertTrue(button("Restore Purchase").exists)
         let shot = XCTAttachment(screenshot: app.screenshot())
         shot.name = "RDMC-Registration-Review"
