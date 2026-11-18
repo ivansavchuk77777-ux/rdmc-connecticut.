@@ -13,12 +13,20 @@ export function Registration({onRegister, onBack}) {
     let active = true;
     async function refresh() {
       try {
-        const status = await store.status();
-        if (active) setItem(status);
+        const {owned} = await store.status();
+        if (active && owned) setItem({owned: true});
       } catch (error) {
-        if (active) { setItem({priceUnavailable: true}); setMessage(error.message); }
+        if (active) setMessage(error.message);
       }
     }
+    store.pricing().then(({price}) => {
+      if (active) setItem(previous => previous?.owned ? previous : {price});
+    }).catch(error => {
+      if (active) {
+        setItem(previous => previous?.owned ? previous : {priceUnavailable: true});
+        setMessage(error.message);
+      }
+    });
     refresh();
     const listener = store.addListener('registrationChanged', refresh);
     return () => { active = false; listener.then(handle => handle.remove()).catch(() => {}); };
@@ -29,7 +37,8 @@ export function Registration({onRegister, onBack}) {
     setMessage('');
     try {
       if (action === 'retry') {
-        setItem(await store.status());
+        const {price} = await store.pricing();
+        setItem(previous => previous?.owned ? previous : {price});
       } else if (action === 'register') {
         if ((await store.status()).owned) await onRegister();
         else setMessage('Restore your purchase to continue.');
