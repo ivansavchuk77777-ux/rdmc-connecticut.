@@ -1,3 +1,4 @@
+import {execFileSync} from 'node:child_process';
 import assert from 'node:assert/strict';
 import { createHash } from 'node:crypto';
 import { readFile, writeFile, access } from 'node:fs/promises';
@@ -28,3 +29,5 @@ await writeFile(join(catalog, 'Contents.json'), JSON.stringify({
   info: { author: 'xcode', version: 1 },
 }, null, 2) + '\n');
 console.log('RDMC iOS icon configured: 1024x1024, opaque, original artwork preserved.');
+
+execFileSync('ruby', ['scripts/install-registration.rb'], {stdio: 'inherit'});
