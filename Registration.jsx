@@ -16,7 +16,7 @@ export function Registration({onRegister, onBack}) {
         const status = await store.status();
         if (active) setItem(status);
       } catch (error) {
-        if (active) setMessage(error.message);
+        if (active) { setItem({priceUnavailable: true}); setMessage(error.message); }
       }
     }
     refresh();
@@ -28,12 +28,17 @@ export function Registration({onRegister, onBack}) {
     setBusy(true);
     setMessage('');
     try {
-      if (action === 'register') {
+      if (action === 'retry') {
+        setItem(await store.status());
+      } else if (action === 'register') {
         if ((await store.status()).owned) await onRegister();
         else setMessage('Restore your purchase to continue.');
       } else {
         const result = action === 'restore' ? await store.restore() : await store.purchase();
-        if (result.owned) setItem({owned: true});
+        if (result.owned) {
+          setItem({owned: true});
+          if (action === 'restore') setMessage('Registration purchase restored.');
+        }
         else if (result.pending) setMessage('Your purchase is pending Apple approval.');
         else if (action === 'restore') setMessage('Apple found no registration purchase for this Apple Account.');
       }
@@ -47,6 +52,7 @@ export function Registration({onRegister, onBack}) {
     <p>Register an RDMC account for a one-time fee in addition to the app download. Ivan approves membership and separately controls access to member contacts.</p>
     {item?.owned
       ? <button disabled={busy} onClick={() => perform('register')}>Complete registration</button>
+      : item?.priceUnavailable ? <button disabled={busy} onClick={() => perform('retry')}>Retry App Store price</button>
       : <button disabled={busy || !item?.price} onClick={() => perform('purchase')}>
           {item?.price ? 'Register for ' + item.price : 'Checking App Store price…'}
         </button>}
