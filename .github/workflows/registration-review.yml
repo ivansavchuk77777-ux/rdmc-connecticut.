@@ -8,7 +8,9 @@ permissions:
   contents: read
 jobs:
   registration:
-    runs-on: macos-latest
+    runs-on: macos-15
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_16.4.app/Contents/Developer
     timeout-minutes: 45
     steps:
       - uses: actions/checkout@v4
@@ -25,7 +27,7 @@ jobs:
           node scripts/prepare-ios-icon.mjs
           ruby ios-review/configure-tests.rb
           mkdir -p screenshots
-          udid=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; print(next(d["udid"] for runtime,devices in json.load(sys.stdin)["devices"].items() if "SimRuntime.iOS" in runtime for d in devices if d["name"].startswith("iPhone") and d["isAvailable"]))')
+          udid=$(xcrun simctl list devices available -j | python3 -c 'import json,sys; print(next(d["udid"] for runtime,devices in json.load(sys.stdin)["devices"].items() if runtime.endswith("SimRuntime.iOS-18-5") for d in devices if d["name"].startswith("iPhone") and d["isAvailable"]))')
           xcrun simctl bootstatus "$udid" -b
           xcodebuild test -workspace ios/App/App.xcworkspace -scheme RegistrationReview \
             -destination "platform=iOS Simulator,id=$udid" -parallel-testing-enabled NO -retry-tests-on-failure -test-iterations 2 \
