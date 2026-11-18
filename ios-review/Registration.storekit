@@ -1,0 +1,7 @@
+{
+  "identifier":"9B3CC31D-47DA-47A7-A7AE-1E475F5B3B73",
+  "products":[{"displayPrice":"1.99","familyShareable":false,"internalID":"6836517545","localizations":[{"description":"Register once. Contacts require owner approval.","displayName":"RDMC Registration","locale":"en_US"}],"productID":"us.rdmcfairfieldcounty.live.registration","referenceName":"RDMC One-Time Registration","type":"NonConsumable"}],
+  "settings":{"_locale":"en_US","_storefront":"USA"},
+  "subscriptionGroups":[],
+  "version":{"major":3,"minor":0}
+}
