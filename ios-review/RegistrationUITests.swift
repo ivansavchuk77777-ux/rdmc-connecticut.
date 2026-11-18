@@ -44,6 +44,7 @@ final class RegistrationUITests: XCTestCase {
         XCTAssertTrue(button("Complete registration").waitForExistence(timeout: 30))
         let restore = button("Restore Purchase")
         restore.tap()
+        XCTAssertTrue(web.staticTexts["Registration purchase restored."].firstMatch.waitForExistence(timeout: 30))
         let complete = button("Complete registration")
         let ready = NSPredicate(format: "exists == true AND enabled == true")
         let restored = XCTNSPredicateExpectation(predicate: ready, object: complete)
