@@ -41,6 +41,7 @@ jobs:
           mkdir -p dist/website
           cp website/*.jpeg dist/website/
           cp website/index.html website/sitemap.xml website/robots.txt website/voice*.mjs website/voice.css dist/website/
+          cp website/amazon-merch.mjs website/merch-store.mjs dist/website/
       - uses: actions/configure-pages@v5
       - uses: actions/upload-pages-artifact@v3
         with:
