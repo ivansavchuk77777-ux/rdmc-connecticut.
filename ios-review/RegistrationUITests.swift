@@ -36,6 +36,12 @@ final class RegistrationUITests: XCTestCase {
         add(shot)
         buy.tap()
         XCTAssertTrue(button("Complete registration").waitForExistence(timeout: 30))
+        let restore = button("Restore Purchase")
+        restore.tap()
+        let complete = button("Complete registration")
+        let ready = NSPredicate(format: "exists == true AND enabled == true")
+        let restored = XCTNSPredicateExpectation(predicate: ready, object: complete)
+        XCTAssertEqual(XCTWaiter.wait(for: [restored], timeout: 30), .completed)
         XCTAssertEqual(session.allTransactions().count, 1)
     }
 }
