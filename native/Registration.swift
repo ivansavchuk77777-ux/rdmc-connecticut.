@@ -6,7 +6,7 @@ import StoreKit
 final class RDMCRegistrationPlugin: CAPPlugin, CAPBridgedPlugin {
     let identifier = "RDMCRegistrationPlugin"
     let jsName = "RDMCRegistration"
-    let pluginMethods: [CAPPluginMethod] = ["status", "purchase", "restore"].compactMap {
+    let pluginMethods: [CAPPluginMethod] = ["status", "pricing", "purchase", "restore"].compactMap {
         CAPPluginMethod(name: $0, returnType: CAPPluginReturnPromise)
     }
     private let productID = "us.rdmcfairfieldcounty.live.registration"
@@ -46,13 +46,18 @@ final class RDMCRegistrationPlugin: CAPPlugin, CAPBridgedPlugin {
         return item
     }
 
-    @objc func status(_ call: CAPPluginCall) {
+    @objc func pricing(_ call: CAPPluginCall) {
         Task {
-            if await ownsRegistration() { call.resolve(["owned": true]); return }
             do {
                 let item = try await product()
-                call.resolve(["owned": false, "price": item.displayPrice])
+                call.resolve(["price": item.displayPrice])
             } catch { call.reject(error.localizedDescription) }
+        }
+    }
+
+    @objc func status(_ call: CAPPluginCall) {
+        Task {
+            call.resolve(["owned": await ownsRegistration()])
         }
     }
 
