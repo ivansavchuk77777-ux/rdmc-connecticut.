@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: app-store-ios-preparation
+          ref: 3ef0de7fb35ba230eea485212f54480b38dd7121
       - uses: actions/setup-node@v4
         with:
           node-version: 22
