@@ -66,6 +66,22 @@ jobs:
             sips -g pixelWidth -g pixelHeight "screenshots/$label.png"
             xcrun simctl shutdown "$udid"
           done < /tmp/rdmc-devices.txt
+      - name: Capture the one-time registration purchase for Apple Review
+        run: |
+          node scripts/prepare-ios-icon.mjs
+          ruby ios-review/configure-tests.rb
+          udid=$(awk '$1 == "iPhone" {print $2}' /tmp/rdmc-devices.txt)
+          xcodebuild test -workspace ios/App/App.xcworkspace -scheme RegistrationReview \
+            -destination "platform=iOS Simulator,id=$udid" -parallel-testing-enabled NO \
+            -resultBundlePath /tmp/registration.xcresult CODE_SIGNING_ALLOWED=NO
+          xcrun xcresulttool export attachments --path /tmp/registration.xcresult --output-path /tmp/registration-attachments
+          python3 - <<'PY'
+          import json, pathlib, shutil
+          root = pathlib.Path('/tmp/registration-attachments')
+          items = json.loads((root / 'manifest.json').read_text())
+          shot, = [att for case in items for att in case['attachments'] if att['suggestedHumanReadableName'].startswith('RDMC-Registration-Review')]
+          shutil.copyfile(root / shot['exportedFileName'], 'screenshots/Registration.png')
+          PY
       - uses: actions/upload-artifact@v4
         with:
           name: rdmc-store-screenshots
