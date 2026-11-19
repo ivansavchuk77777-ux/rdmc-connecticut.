@@ -8,6 +8,8 @@ project = Xcodeproj::Project.open("#{root}/App.xcodeproj")
 app = project.targets.find { |t| t.product_type == 'com.apple.product-type.application' }
 test = project.new_target(:ui_test_bundle, 'RegistrationUITests', :ios, '15.0')
 test.add_dependency(app)
+attributes = project.root_object.attributes['TargetAttributes'] ||= {}
+(attributes[test.uuid] ||= {})['TestTargetID'] = app.uuid
 group = project.main_group.new_group('RegistrationUITests', 'RegistrationUITests')
 test.source_build_phase.add_file_reference(group.new_file(files.first))
 configuration = group.new_file(files.last)
