@@ -40,8 +40,25 @@ final class RegistrationUITests: XCTestCase {
         shot.name = "RDMC-Registration-Review"
         shot.lifetime = .keepAlways
         add(shot)
+        guard buy.isEnabled && buy.isHittable else {
+            XCTFail("The priced registration button cannot receive a tap.")
+            return
+        }
         buy.tap()
-        XCTAssertTrue(button("Complete registration").waitForExistence(timeout: 30))
+        guard button("Complete registration").waitForExistence(timeout: 35) else {
+            let knownMessages = [
+                "Registration could not be verified.",
+                "Apple could not verify this purchase.",
+                "Your purchase is pending Apple approval.",
+                "Registration pricing is unavailable in the App Store. Try again later."
+            ]
+            let messages = web.staticTexts.allElementsBoundByIndex.map(\.label)
+            let known = knownMessages.filter { messages.contains($0) }
+            let storePrompt = XCUIApplication(bundleIdentifier: "com.apple.springboard").alerts.firstMatch.exists
+            let returned = buy.exists && buy.isEnabled
+            XCTFail("Purchase did not complete. Transactions: \(session.allTransactions().count), button ready: \(returned), system alert: \(storePrompt), recognized messages: \(known)")
+            return
+        }
         let restore = button("Restore Purchase")
         restore.tap()
         XCTAssertTrue(web.staticTexts["Registration purchase restored."].firstMatch.waitForExistence(timeout: 30))
