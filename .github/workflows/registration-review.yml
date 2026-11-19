@@ -15,7 +15,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: a0ef6eee97ea78713ae1f46fd6d7709e3173ba8b
+          ref: 0908ecadc1bd086e37bfb26be3c50ceb4f11ccf4
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -40,15 +40,21 @@ jobs:
           xcodebuild test -workspace ios/App/App.xcworkspace -scheme RegistrationReview \
             -destination "platform=iOS Simulator,id=$udid" -parallel-testing-enabled NO -retry-tests-on-failure -test-iterations 2 \
             -resultBundlePath /tmp/registration.xcresult CODE_SIGN_IDENTITY="-"
+      - name: Export the registration screen captured before purchase
+        if: ${{ !cancelled() }}
+        run: |
           xcrun xcresulttool export attachments --path /tmp/registration.xcresult --output-path /tmp/registration-attachments
           python3 - <<'PY'
           import json, pathlib, shutil
           root = pathlib.Path('/tmp/registration-attachments')
           items = json.loads((root / 'manifest.json').read_text())
-          shot, = [att for case in items for att in case['attachments'] if att['suggestedHumanReadableName'].startswith('RDMC-Registration-Review')]
-          shutil.copyfile(root / shot['exportedFileName'], 'screenshots/Registration.png')
+          shots = [att for case in items for att in case['attachments'] if att['suggestedHumanReadableName'].startswith('RDMC-Registration-Review')]
+          if not shots:
+              raise SystemExit("The registration price screen was not captured")
+          shutil.copyfile(root / shots[-1]['exportedFileName'], 'screenshots/Registration.png')
           PY
       - uses: actions/upload-artifact@v4
+        if: ${{ !cancelled() && hashFiles('screenshots/Registration.png') != '' }}
         with:
           name: rdmc-registration-review
           path: screenshots/Registration.png
