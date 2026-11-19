@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: app-store-ios-preparation
+          ref: f1abc882a60cfde9927dd4b34af204b92fa29ffd
       - name: Require existing signing credentials
         env:
           IOS_DISTRIBUTION_P12_BASE64: ${{ secrets.IOS_DISTRIBUTION_P12_BASE64 }}
