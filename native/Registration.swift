@@ -27,13 +27,10 @@ final class RDMCRegistrationPlugin: CAPPlugin, CAPBridgedPlugin {
     deinit { listener?.cancel() }
 
     private func ownsRegistration() async -> Bool {
-        for await result in Transaction.currentEntitlements {
-            if case .verified(let transaction) = result,
-               transaction.productID == productID, transaction.revocationDate == nil {
-                return true
-            }
-        }
-        return false
+        guard let result = await Transaction.latest(for: productID),
+              case .verified(let transaction) = result else { return false }
+        return transaction.productID == productID &&
+            transaction.productType == .nonConsumable && transaction.revocationDate == nil
     }
 
     private func product() async throws -> Product {
@@ -63,7 +60,6 @@ final class RDMCRegistrationPlugin: CAPPlugin, CAPBridgedPlugin {
 
     @objc func purchase(_ call: CAPPluginCall) {
         Task { @MainActor in
-            if await ownsRegistration() { call.resolve(["owned": true]); return }
             do {
                 let item = try await product()
                 switch try await item.purchase() {
