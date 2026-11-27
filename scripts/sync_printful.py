@@ -22,7 +22,7 @@ source = p.read_text()
 match = re.search(r'^const merch=(\[.*\]);$', source, re.M)
 if not match:
     raise RuntimeError("Catalog declaration not found")
-existing = [entry for entry in json.loads(match.group(1)) if entry.get("url")]
+existing = json.loads(match.group(1))
 catalog = []
 offset = 0
 while True:
@@ -33,7 +33,6 @@ while True:
     if not batch or offset >= response.get("paging", {}).get("total", offset):
         break
 target = "499679302"
-other_gaiter = "499701986"
 if not any(str(x.get("id")) == target for x in catalog):
     try:
         direct = get("/store/products/" + target)["result"]["sync_product"]
@@ -63,11 +62,11 @@ try:
         parser.feed(response.read(2000000).decode("utf-8", errors="replace"))
 except OSError as exc:
     print(f"::warning::Could not verify the public Printful storefront. Preserving the catalog. {exc}")
-    raise SystemExit(0) from None
+    # API catalog remains usable even when storefront HTML is unavailable.
 
 for product in catalog:
     product_id = str(product["id"])
-    if product.get("is_ignored") or product_id == other_gaiter:
+    if product.get("is_ignored"):
         continue
     detail = get("/store/products/" + product_id)["result"]
     item = detail["sync_product"]
@@ -75,8 +74,7 @@ for product in catalog:
     slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
     prior = next((entry for entry in existing if str(entry.get("id")) == product_id), None)
     if prior is None and (
-        slug not in parser.links
-        or any(entry["url"] == slug or entry["name"].casefold() == name.casefold() for entry in existing)
+        any(entry.get("url") == slug or entry["name"].casefold() == name.casefold() or entry.get("image") == item.get("thumbnail_url") for entry in existing)
     ):
         continue
     variants = [
@@ -90,35 +88,34 @@ for product in catalog:
     prices = [float(variant["retail_price"]) for variant in variants]
     if not all(math.isfinite(price) and price > 0 for price in prices):
         continue
-    if product_id == target and min(prices) != 13.50:
-        print("Requested neck gaiter does not match the approved $13.50 retail price")
-        continue
-    if prior is not None:
-        prior.update(price=min(prices), image=item["thumbnail_url"], name=name)
-        continue
     product_path = "/product/" + slug
+    verified = ""
     try:
         with urllib.request.urlopen(urljoin(shop, product_path), timeout=20) as response:
             final_url = urlsplit(response.geturl())
-            if response.status != 200 or final_url.netloc != urlsplit(shop).netloc or final_url.path.rstrip("/") != product_path:
-                continue
+            if slug in parser.links and response.status == 200 and final_url.netloc == urlsplit(shop).netloc and final_url.path.rstrip("/") == product_path:
+                verified = slug
     except OSError as exc:
         print(f"::warning::Could not verify Printful product page {slug}. {exc}")
+    if prior is not None:
+        prior.update(price=min(prices), image=item["thumbnail_url"], name=name)
+        if verified:
+            prior["url"] = verified
         continue
     existing.append({
         "id": item["id"],
         "name": name,
         "category": "Support Gear",
         "price": min(prices),
-        "url": slug,
+        "url": verified,
         "image": item["thumbnail_url"],
         "detail": "From price; choose options in official store" if min(prices) != max(prices) else "Choose options in official store",
     })
-    print("Imported advertised product:", slug)
+    print("Imported catalog product:", slug)
 
 print("Returned catalog IDs:", [x.get("id") for x in catalog])
 p.write_text(source[:match.start(1)] + json.dumps(existing, ensure_ascii=False, separators=(",",":")) + source[match.end(1):])
 print("Catalog entries:", len(existing))
 if not any(str(x.get("id")) == "499679302" for x in existing):
-    print("::notice::Requested neck gaiter is unavailable as a verified $13.50 product in Printful store " + store)
+    print("::notice::Original requested product ID is unavailable in Printful store " + store)
 
