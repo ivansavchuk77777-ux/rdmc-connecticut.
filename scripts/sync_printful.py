@@ -1,12 +1,15 @@
-import json, os, re, urllib.request
+import json, os, re, urllib.request, urllib.error
 from pathlib import Path
 
 token = os.environ["PRINTFUL_API_TOKEN"]
-store = "18911068"
+store = os.environ.get("PRINTFUL_STORE_ID", "18911068")
 def get(path):
     req = urllib.request.Request("https://api.printful.com" + path, headers={"Authorization": "Bearer " + token, "X-PF-Store-Id": store})
-    with urllib.request.urlopen(req, timeout=30) as response:
-        return json.load(response)
+    try:
+        with urllib.request.urlopen(req, timeout=30) as response:
+            return json.load(response)
+    except urllib.error.HTTPError as exc:
+        raise RuntimeError(f"Printful API {path.split(chr(63))[0]} returned HTTP {exc.code}; check store access and token scopes") from None
 p = Path("src.jsx")
 source = p.read_text()
 match = re.search(r'^const merch=(\[.*\]);$', source, re.M)
@@ -41,3 +44,6 @@ for product in catalog:
     existing.append({"id":item["id"],"name":name,"category":"Support Gear","price":min(prices),"url":"","image":item["thumbnail_url"],"detail":"From price; choose options in official store" if min(prices)!=max(prices) else "Choose options in official store"})
 p.write_text(source[:match.start(1)] + json.dumps(existing, ensure_ascii=False, separators=(",",":")) + source[match.end(1):])
 print("Catalog entries:", len(existing))
+if not any(str(x.get("id")) == "499679302" for x in existing):
+    print("Requested product 499679302 not imported; verify it is published in store " + store)
+
