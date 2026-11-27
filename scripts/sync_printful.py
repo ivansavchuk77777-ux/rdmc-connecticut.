@@ -25,6 +25,15 @@ while True:
     offset += len(batch)
     if not batch or offset >= response.get("paging", {}).get("total", offset):
         break
+target = "499679302"
+if not any(str(x.get("id")) == target for x in catalog):
+    try:
+        direct = get("/store/products/" + target)["result"]["sync_product"]
+        if str(direct.get("id")) == target:
+            catalog.append(direct)
+            print("Located requested product through direct lookup")
+    except RuntimeError as exc:
+        print(str(exc))
 if not catalog:
     raise RuntimeError("No products returned; preserving existing catalog")
 for product in catalog:
