@@ -1,8 +1,12 @@
-import json, os, re, urllib.request, urllib.error
+import json
+import math
+import os
+import re
+import urllib.error
+import urllib.request
 from pathlib import Path
 from html.parser import HTMLParser
 from urllib.parse import urlsplit, urljoin
-import math
 
 token = os.environ["PRINTFUL_API_TOKEN"]
 store = os.environ.get("PRINTFUL_STORE_ID", "18911068")
@@ -18,7 +22,7 @@ source = p.read_text()
 match = re.search(r'^const merch=(\[.*\]);$', source, re.M)
 if not match:
     raise RuntimeError("Catalog declaration not found")
-existing = json.loads(match.group(1))
+existing = [entry for entry in json.loads(match.group(1)) if entry.get("url")]
 catalog = []
 offset = 0
 while True:
@@ -29,6 +33,7 @@ while True:
     if not batch or offset >= response.get("paging", {}).get("total", offset):
         break
 target = "499679302"
+other_gaiter = "499701986"
 if not any(str(x.get("id")) == target for x in catalog):
     try:
         direct = get("/store/products/" + target)["result"]["sync_product"]
@@ -39,27 +44,6 @@ if not any(str(x.get("id")) == target for x in catalog):
         print(str(exc))
 if not catalog:
     raise RuntimeError("No products returned; preserving existing catalog")
-for product in catalog:
-    if product.get("is_ignored"):
-        continue
-    detail = get("/store/products/" + str(product["id"]))["result"]
-    item = detail["sync_product"]
-    variants = [v for v in detail["sync_variants"] if not v.get("is_ignored") and v.get("retail_price") is not None]
-    if not variants or not item.get("thumbnail_url"):
-        continue
-    name = item["name"]
-    if any(v.get("currency", "USD") != "USD" for v in variants):
-        continue
-    prices = [float(v["retail_price"]) for v in variants]
-    if not all(math.isfinite(v) and v > 0 for v in prices):
-        continue
-    prior = next((x for x in existing if str(x.get("id")) == str(item["id"])), None)
-    if prior is not None:
-        prior.update(price=min(prices), image=item["thumbnail_url"], name=name)
-        continue
-    if any(x["name"].casefold() == name.casefold() for x in existing):
-        continue
-    existing.append({"id":item["id"],"name":name,"category":"Support Gear","price":min(prices),"url":"","image":item["thumbnail_url"],"detail":"From price; choose options in official store" if min(prices)!=max(prices) else "Choose options in official store"})
 # Resolve only links advertised by the official storefront.
 shop = "https://rdmcfairfieldcounty.printful.me/"
 class Links(HTMLParser):
@@ -73,27 +57,65 @@ class Links(HTMLParser):
                 m = re.fullmatch(r"/product/([a-z0-9-]+)/?", url.path)
                 if m:
                     self.links.add(m.group(1))
-try:
-    parser = Links()
-    with urllib.request.urlopen(shop, timeout=20) as response:
-        parser.feed(response.read(2000000).decode("utf-8", errors="replace"))
-    for entry in existing:
-        if entry.get("url"):
+parser = Links()
+with urllib.request.urlopen(shop, timeout=20) as response:
+    parser.feed(response.read(2000000).decode("utf-8", errors="replace"))
+
+for product in catalog:
+    product_id = str(product["id"])
+    if product.get("is_ignored") or product_id == other_gaiter:
+        continue
+    detail = get("/store/products/" + product_id)["result"]
+    item = detail["sync_product"]
+    name = item["name"]
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    prior = next((entry for entry in existing if str(entry.get("id")) == product_id), None)
+    if prior is None and (
+        slug not in parser.links
+        or any(entry["url"] == slug or entry["name"].casefold() == name.casefold() for entry in existing)
+    ):
+        continue
+    variants = [
+        variant for variant in detail["sync_variants"]
+        if not variant.get("is_ignored") and variant.get("retail_price") is not None
+    ]
+    if not variants or not item.get("thumbnail_url"):
+        continue
+    if any(variant.get("currency", "USD") != "USD" for variant in variants):
+        continue
+    prices = [float(variant["retail_price"]) for variant in variants]
+    if not all(math.isfinite(price) and price > 0 for price in prices):
+        continue
+    if product_id == target and min(prices) != 13.50:
+        print("Requested neck gaiter does not match the approved $13.50 retail price")
+        continue
+    if prior is not None:
+        prior.update(price=min(prices), image=item["thumbnail_url"], name=name)
+        continue
+    product_path = "/product/" + slug
+    try:
+        with urllib.request.urlopen(urljoin(shop, product_path), timeout=20) as response:
+            final_url = urlsplit(response.geturl())
+            if response.status != 200 or final_url.netloc != urlsplit(shop).netloc or final_url.path.rstrip("/") != product_path:
+                continue
+    except urllib.error.HTTPError as exc:
+        if exc.code == 404:
             continue
-        slug = re.sub(r"[^a-z0-9]+", "-", entry["name"].lower()).strip("-")
-        if slug in parser.links:
-            try:
-                with urllib.request.urlopen(shop + "product/" + slug, timeout=20) as response:
-                    if response.status == 200 and urlsplit(response.geturl()).netloc == urlsplit(shop).netloc and urlsplit(response.geturl()).path.rstrip("/") == "/product/" + slug:
-                        entry["url"] = slug
-                        print("Advertised product link resolved:", slug)
-            except OSError:
-                print("Product link unavailable:", slug)
-except OSError:
-    print("Storefront link discovery unavailable; preserving links")
+        raise
+    existing.append({
+        "id": item["id"],
+        "name": name,
+        "category": "Support Gear",
+        "price": min(prices),
+        "url": slug,
+        "image": item["thumbnail_url"],
+        "detail": "From price; choose options in official store" if min(prices) != max(prices) else "Choose options in official store",
+    })
+    print("Imported advertised product:", slug)
+
 print("Returned catalog IDs:", [x.get("id") for x in catalog])
 p.write_text(source[:match.start(1)] + json.dumps(existing, ensure_ascii=False, separators=(",",":")) + source[match.end(1):])
 print("Catalog entries:", len(existing))
 if not any(str(x.get("id")) == "499679302" for x in existing):
-    print("Requested product 499679302 not imported; verify it is published in store " + store)
+    print("::notice::Requested neck gaiter is unavailable as a verified $13.50 product in Printful store " + store)
 
