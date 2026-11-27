@@ -58,8 +58,12 @@ class Links(HTMLParser):
                 if m:
                     self.links.add(m.group(1))
 parser = Links()
-with urllib.request.urlopen(shop, timeout=20) as response:
-    parser.feed(response.read(2000000).decode("utf-8", errors="replace"))
+try:
+    with urllib.request.urlopen(shop, timeout=20) as response:
+        parser.feed(response.read(2000000).decode("utf-8", errors="replace"))
+except OSError as exc:
+    print(f"::warning::Could not verify the public Printful storefront. Preserving the catalog. {exc}")
+    raise SystemExit(0) from None
 
 for product in catalog:
     product_id = str(product["id"])
@@ -98,10 +102,9 @@ for product in catalog:
             final_url = urlsplit(response.geturl())
             if response.status != 200 or final_url.netloc != urlsplit(shop).netloc or final_url.path.rstrip("/") != product_path:
                 continue
-    except urllib.error.HTTPError as exc:
-        if exc.code == 404:
-            continue
-        raise
+    except OSError as exc:
+        print(f"::warning::Could not verify Printful product page {slug}. {exc}")
+        continue
     existing.append({
         "id": item["id"],
         "name": name,
