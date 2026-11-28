@@ -1,0 +1,69 @@
+/* RDMC Fairfield County public-site palette */
+:root {
+  --chapter-red: #a41122;
+  --chapter-ink: #17171c;
+  --chapter-muted: #4a4a50;
+  --chapter-card: #151519;
+  --chapter-rose: #ff8c97;
+  color-scheme: light;
+}
+:root, body, main, .hero {
+  background: #fff;
+  color: var(--chapter-ink);
+}
+.hero { border-color: #dedee1; }
+.hero::after { background: none; }
+.hero > span, .hero .tag, .payIcon { color: var(--chapter-red); }
+.hero p, .title p, .privateGate p, .paywall p, .paywall > small,
+.paywall h1 small, .directoryNote, .permissionNote, .consumptionSync,
+.consumptionHistory small, .consumptionForm small { color: var(--chapter-muted); }
+main > header, nav {
+  background: var(--chapter-red);
+  color: #fff;
+  border-color: #750b16;
+}
+header b, header small, .bell, header .languageControl, nav button { color: #fff; }
+nav button.on, .authSwitch button.on {
+  background: #7f0d19;
+  color: #fff !important;
+  box-shadow: inset 0 -3px #fff;
+}
+header .memberLogin, header .brotherLogin, header select {
+  background: #fff;
+  color: var(--chapter-red);
+  border: 1px solid #fff;
+}
+.stats article, .card, .row, .country, .authBox, .accountBadge, .memberInvite,
+.inventoryRow, .worldUpdate, .merchCard, .adminHero, .consumptionSummary,
+.eventFlyer, .chatFeed {
+  background: var(--chapter-card);
+  border-color: var(--chapter-red);
+  color: #fff;
+  color-scheme: dark;
+}
+.card p, .stats small, .row small, .authMsg, .worldUpdate p,
+.merchCard small, .inventoryName small, .adminMember small,
+.memberInvite small, .worldUpdateHead small, .eventFlyer small,
+.card .consumptionSync, .card .consumptionForm small { color: #e2e2e5; }
+.tag, .stats svg, .row > svg, .country svg, .inventoryName span,
+.adminHero > b, .worldUpdateHead svg, .memberPhone,
+.contactCard a svg, .contactCard p svg { color: var(--chapter-rose); }
+.hero button, .card button, .add, .privateGate button, .adminLaunch,
+.memberInvite button, .chatComposer button, .zoomJoin, .paywall button,
+.merchCard button, .authBox > button:not(.authClose) {
+  color: #fff;
+  background: var(--chapter-red);
+}
+.chatError { color: var(--chapter-red); }
+.card .chatError, .authBox .chatError { color: var(--chapter-rose); }
+.consumptionTableWrap { background: var(--chapter-card); color: #fff; }
+body .sol-live-launcher {
+  background: var(--chapter-card);
+  border-color: var(--chapter-red);
+  box-shadow: 0 6px 18px #5c0d1733;
+}
+body .sol-live-launcher img { border-color: var(--chapter-rose); box-shadow: none; }
+body .sol-live-launcher small { color: #ffe9ec; }
+:focus-visible { outline: 2px solid var(--chapter-red); outline-offset: 2px; }
+header :focus-visible, nav :focus-visible, .card :focus-visible,
+.authBox :focus-visible { outline-color: #fff; }
