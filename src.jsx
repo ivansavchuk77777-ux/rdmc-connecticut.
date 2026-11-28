@@ -2,7 +2,7 @@ import {AccountDeletion,DeletionQueue} from './AccountDeletion';
 import VoiceControl from './VoiceControl';
 import ConsumptionTracker from './ConsumptionTracker';
 import {PUBLIC_EVENTS,splitEvents,chapterDay,formatEventDate,formatChapterTime,nextChapterMeeting} from './calendar.mjs';
-import React,{useEffect,useState}from'react';import{createRoot}from'react-dom/client';import{Home,Users,CheckSquare,MessageCircle,CalendarDays,Video,Plus,MapPin,Bell,Wallet,ChevronRight,Globe2,Mail,ExternalLink,ShoppingBag,ShieldCheck}from'lucide-react';import'./style.css';import{supabase}from'./supabase';
+import React,{useEffect,useState}from'react';import{createRoot}from'react-dom/client';import{Home,Users,CheckSquare,MessageCircle,CalendarDays,Video,Plus,MapPin,Bell,Wallet,ChevronRight,Globe2,Mail,ExternalLink,ShoppingBag,ShieldCheck}from'lucide-react';import'./style.css';import './chapter-theme.css';import{supabase}from'./supabase';
 const members=[['Ivan Savchuk','Member'],['Road Captain','Officer'],['Treasurer','Officer']];
 const countries=['England','Wales','Northern Ireland','Sweden','Belgium','United States','Netherlands','Germany','Latvia','Australia','Canada','Luxembourg','China','Ukraine','Türkiye','Lithuania','Iceland','Spain'];
 const publicContacts=[
